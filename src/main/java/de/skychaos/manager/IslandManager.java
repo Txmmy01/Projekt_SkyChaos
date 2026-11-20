@@ -72,8 +72,10 @@ public final class IslandManager {
                     && world.getBlockAt(x,y,z).getType().isAir())
                 world.getBlockAt(x,y,z).setType(Material.OAK_LEAVES,false);
         }
-        world.getBlockAt(1,80,2).setType(Material.STONE_BRICKS,false);
-        world.getBlockAt(3,80,2).setType(Material.STONE_BRICKS,false);
+        for(int z=1;z<=3;z++) {
+            world.getBlockAt(1,81,z).setType(Material.STONE_BRICKS,false);
+            world.getBlockAt(3,81,z).setType(Material.STONE_BRICKS,false);
+        }
         world.getBlockAt(2,80,1).setType(Material.STONE_BRICKS,false);
         world.getBlockAt(2,80,3).setType(Material.STONE_BRICKS,false);
         world.getBlockAt(2,81,1).setType(Material.WATER,false);
