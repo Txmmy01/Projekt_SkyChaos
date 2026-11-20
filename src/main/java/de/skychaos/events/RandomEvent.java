@@ -7,18 +7,18 @@ public abstract class RandomEvent {
     protected final SkyChaos plugin;
 
     protected RandomEvent(SkyChaos plugin) {
-        this.plugin = plugin;
+        this.plugin=plugin;
     }
 
     public abstract String id();
     public abstract String name();
     public abstract void execute(Player player);
 
-    protected boolean enabled() {
-        return plugin.getConfigManager().getBoolean("events." + id() + ".enabled", true);
+    protected boolean enabled(String eventId) {
+        return plugin.getConfigManager().getBoolean("events."+eventId+".enabled",true);
     }
 
-    protected int value(String key, int fallback) {
-        return plugin.getConfigManager().getInt("events." + id() + "." + key, fallback);
+    protected int value(String eventId,String key,int fallback) {
+        return plugin.getConfigManager().getInt("events."+eventId+"."+key,fallback);
     }
 }
