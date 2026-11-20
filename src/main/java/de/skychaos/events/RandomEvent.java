@@ -52,7 +52,15 @@ public abstract class RandomEvent {
     }
 
     protected void schedule(Runnable action,long delayTicks) {
-        tasks.add(Bukkit.getScheduler().runTaskLater(plugin,action,Math.max(1L,delayTicks)));
+        BukkitTask[] holder=new BukkitTask[1];
+        holder[0]=Bukkit.getScheduler().runTaskLater(plugin,()->{
+            try {
+                action.run();
+            } finally {
+                tasks.remove(holder[0]);
+            }
+        },Math.max(1L,delayTicks));
+        tasks.add(holder[0]);
     }
 
     public void cleanup() {
