@@ -85,10 +85,10 @@ public final class ChaosEvents extends RandomEvent {
         int amount=Math.max(0,value("mob-swarm","amount",8));
         int current=plugin.getIslandManager().countIslandEntities();
         int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
-        for(int i=0;i<Math.min(amount,available);i++) {
-            Location location=safeLocation();
-            if(location==null) break;
-            track(player.getWorld().spawnEntity(location,types[i%types.length]));
+        int spawnAmount=Math.min(amount,available);
+        List<Location> locations=plugin.getIslandManager().randomSurfaceLocations(spawnAmount);
+        for(int i=0;i<locations.size();i++) {
+            track(player.getWorld().spawnEntity(locations.get(i),types[i%types.length]));
         }
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fMob-Schwarm!");
     }
@@ -96,9 +96,7 @@ public final class ChaosEvents extends RandomEvent {
     private void spawnMobs(Player player,int amount,EntityType type) {
         int current=plugin.getIslandManager().countIslandEntities();
         int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
-        for(int i=0;i<Math.min(Math.max(0,amount),available);i++) {
-            Location location=safeLocation();
-            if(location==null) break;
+        for(Location location:plugin.getIslandManager().randomSurfaceLocations(Math.min(Math.max(0,amount),available))) {
             track(player.getWorld().spawnEntity(location,type));
         }
     }
