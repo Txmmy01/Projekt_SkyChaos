@@ -90,7 +90,11 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         if(active) {
             timerManager.addPlayer(player);
             lives.putIfAbsent(player.getUniqueId(),getConfig().getInt("lives",3));
-            Bukkit.getScheduler().runTask(this,()->player.teleport(islandManager.getSpawnLocation()));
+            Bukkit.getScheduler().runTask(this,()->{
+                if(lives.getOrDefault(player.getUniqueId(),0)<=0) player.setGameMode(GameMode.SPECTATOR);
+                else player.setGameMode(GameMode.SURVIVAL);
+                player.teleport(islandManager.getSpawnLocation());
+            });
         } else {
             Bukkit.getScheduler().runTask(this,()->prepareIdlePlayer(player));
         }
