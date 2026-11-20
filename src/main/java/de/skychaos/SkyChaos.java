@@ -329,15 +329,15 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         World world=islandManager.getWorld();
         if(previousMobGriefing==null) previousMobGriefing=world.getGameRuleValue(GameRules.MOB_GRIEFING);
         if(previousMobSpawning==null) previousMobSpawning=world.getGameRuleValue(GameRules.SPAWN_MOBS);
-        world.setGameRule(GameRule.MOB_GRIEFING,false);
-        world.setGameRule(GameRule.DO_MOB_SPAWNING,false);
+        world.setGameRule(GameRules.MOB_GRIEFING,false);
+        world.setGameRule(GameRules.SPAWN_MOBS,false);
     }
 
     private void restoreWorldRules() {
         if(islandManager==null) return;
         World world=islandManager.getWorld();
-        if(previousMobGriefing!=null) world.setGameRule(GameRule.MOB_GRIEFING,previousMobGriefing);
-        if(previousMobSpawning!=null) world.setGameRule(GameRule.DO_MOB_SPAWNING,previousMobSpawning);
+        if(previousMobGriefing!=null) world.setGameRule(GameRules.MOB_GRIEFING,previousMobGriefing);
+        if(previousMobSpawning!=null) world.setGameRule(GameRules.SPAWN_MOBS,previousMobSpawning);
         previousMobGriefing=null;
         previousMobSpawning=null;
     }
