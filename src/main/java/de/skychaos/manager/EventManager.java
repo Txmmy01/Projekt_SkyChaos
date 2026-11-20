@@ -164,5 +164,6 @@ public final class EventManager {
 
     public void triggerManual() { triggerRandom(); }
     public int getSurvivedEvents() { return survivedEvents; }
+    public void resetStats() { survivedEvents=0; }
     public void cleanup() { }
 }
