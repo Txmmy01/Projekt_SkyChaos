@@ -68,9 +68,11 @@ public final class IslandManager {
         int ox=Math.min(x1,x2),oy=Math.max(world.getMinHeight(),Math.min(y1,y2)),oz=Math.min(z1,z2);
         int ex=Math.max(x1,x2),ey=Math.min(world.getMaxHeight()-1,Math.max(y1,y2)),ez=Math.max(z1,z2);
         long sx=(long)ex-ox+1,sy=(long)ey-oy+1,sz=(long)ez-oz+1;
-        long count=sx*sy*sz;
-        if(sx<1 || sy<1 || sz<1 || count>plugin.getConfig().getInt("island.max-blocks",50000))
+        long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
+        if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks)
             throw new IllegalArgumentException("Der Bereich ist leer oder überschreitet island.max-blocks.");
+        long count=Math.multiplyExact(Math.multiplyExact(sx,sy),sz);
+        if(count>maxBlocks) throw new IllegalArgumentException("Der Bereich überschreitet island.max-blocks.");
         int radius=plugin.getConfig().getInt("island.max-radius",128);
         if(sx>radius*2L+1 || sz>radius*2L+1) throw new IllegalArgumentException("Die Insel überschreitet island.max-radius.");
 
@@ -124,9 +126,14 @@ public final class IslandManager {
         YamlConfiguration yaml=YamlConfiguration.loadConfiguration(file);
         int ox=yaml.getInt("origin.x"),oy=yaml.getInt("origin.y"),oz=yaml.getInt("origin.z");
         int sx=yaml.getInt("size.x"),sy=yaml.getInt("size.y"),sz=yaml.getInt("size.z");
-        long count=(long)sx*sy*sz;
-        if(sx<1 || sy<1 || sz<1 || count>plugin.getConfig().getInt("island.max-blocks",50000)
-                || oy<world.getMinHeight() || oy+sy>world.getMaxHeight()) {
+        long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
+        if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks
+                || oy<world.getMinHeight() || (long)oy+sy>world.getMaxHeight()
+                || (long)ox+sx-1>Integer.MAX_VALUE || (long)oz+sz-1>Integer.MAX_VALUE) {
+            throw new IllegalStateException("Die gespeicherte Insel ist ungültig oder überschreitet die Weltgrenzen.");
+        }
+        long count=Math.multiplyExact(Math.multiplyExact((long)sx,sy),sz);
+        if(count>maxBlocks) {
             throw new IllegalStateException("Die gespeicherte Insel ist ungültig oder überschreitet die Weltgrenzen.");
         }
         if(!world.getName().equals(yaml.getString("world",world.getName())))
@@ -188,9 +195,14 @@ public final class IslandManager {
         if(!file.isFile()) return;
         YamlConfiguration yaml=YamlConfiguration.loadConfiguration(file);
         int sx=yaml.getInt("size.x"),sy=yaml.getInt("size.y"),sz=yaml.getInt("size.z");
-        if(sx<1 || sy<1 || sz<1) return;
-        minX=yaml.getInt("origin.x"); minY=yaml.getInt("origin.y"); minZ=yaml.getInt("origin.z");
-        maxX=minX+sx-1; maxY=minY+sy-1; maxZ=minZ+sz-1;
+        int ox=yaml.getInt("origin.x"),oy=yaml.getInt("origin.y"),oz=yaml.getInt("origin.z");
+        long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
+        if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks
+                || (long)sx*sy*sz>maxBlocks || oy<world.getMinHeight()
+                || (long)oy+sy>world.getMaxHeight() || (long)ox+sx-1>Integer.MAX_VALUE
+                || (long)oz+sz-1>Integer.MAX_VALUE || !world.getName().equals(yaml.getString("world",world.getName()))) return;
+        minX=ox; minY=oy; minZ=oz;
+        maxX=ox+sx-1; maxY=oy+sy-1; maxZ=oz+sz-1;
         boundsLoaded=true;
     }
 
