@@ -59,7 +59,7 @@ public final class BadEvents extends RandomEvent {
         int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
         int amount=Math.min(Math.max(0,value("creeper-rain","amount",3)),available);
         for(Location surface:plugin.getIslandManager().randomSurfaceLocations(amount)) {
-            track(player.getWorld().spawnEntity(surface.add(0,8,0),EntityType.CREEPER));
+            track(player.getWorld().spawnEntity(surface.add(0,Math.max(0,Math.min(8,player.getWorld().getMaxHeight()-surface.getBlockY()-2)),0),EntityType.CREEPER));
         }
         announce("Creeper-Regen");
     }
