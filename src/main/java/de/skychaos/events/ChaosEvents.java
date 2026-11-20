@@ -47,12 +47,12 @@ public final class ChaosEvents extends RandomEvent {
             }
         }
         World world=player.getWorld();
-        Boolean oldRule=world.getGameRuleValue(GameRule.DO_FIRE_TICK);
+        fireWorld=world;
+        previousFireTick=world.getGameRuleValue(GameRule.DO_FIRE_TICK);
         world.setGameRule(GameRule.DO_FIRE_TICK,false);
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
         schedule(()->{
             for(var flame:flames) if(flame.getType()==Material.FIRE) flame.setType(Material.AIR,false);
-            if(oldRule!=null) world.setGameRule(GameRule.DO_FIRE_TICK,oldRule);
             cleanup();
         },value("fire-storm","duration",10)*20L);
     }
