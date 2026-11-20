@@ -25,7 +25,9 @@ public final class GoodEvents extends RandomEvent {
     public void lootRain(Player player) {
         if(!enabled("loot-rain")) return;
         List<Material> pool=List.of(Material.BREAD,Material.OAK_LOG,Material.COBBLESTONE,Material.IRON_INGOT,Material.ARROW,Material.BONE,Material.COAL);
-        int amount=Math.min(value("loot-rain","amount",10),plugin.getConfig().getInt("events.max-dropped-items",80));
+        int itemCapacity=Math.max(0,plugin.getConfig().getInt("events.max-dropped-items",80)-plugin.getIslandManager().countIslandItems());
+        int entityCapacity=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-plugin.getIslandManager().countIslandEntities());
+        int amount=Math.min(value("loot-rain","amount",10),Math.min(itemCapacity,entityCapacity));
         for(int i=0;i<amount;i++) {
             Location surface=safeLocation();
             if(surface==null) break;
@@ -39,7 +41,9 @@ public final class GoodEvents extends RandomEvent {
         if(!enabled("diamond-rain")) return;
         int min=Math.max(1,value("diamond-rain","min",3));
         int max=Math.max(min,value("diamond-rain","max",5));
-        int amount=Math.min(ThreadLocalRandom.current().nextInt(min,max+1),plugin.getConfig().getInt("events.max-dropped-items",80));
+        int itemCapacity=Math.max(0,plugin.getConfig().getInt("events.max-dropped-items",80)-plugin.getIslandManager().countIslandItems());
+        int entityCapacity=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-plugin.getIslandManager().countIslandEntities());
+        int amount=Math.min(ThreadLocalRandom.current().nextInt(min,max+1),Math.min(itemCapacity,entityCapacity));
         for(int i=0;i<amount;i++) {
             Location surface=safeLocation();
             if(surface==null) break;
