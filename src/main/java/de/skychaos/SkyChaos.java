@@ -235,10 +235,19 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public void onRespawn(PlayerRespawnEvent event) {
         if(!active) return;
         Player player=event.getPlayer();
-        event.setRespawnLocation(resolveChallengeSpawn(player));
+        boolean safeSpawn=true;
+        org.bukkit.Location respawnLocation;
+        try {
+            respawnLocation=islandManager.getSpawnLocation();
+        } catch(IllegalStateException exception) {
+            safeSpawn=false;
+            respawnLocation=islandManager.getWorld().getSpawnLocation();
+        }
+        event.setRespawnLocation(respawnLocation);
+        boolean hasSafeSpawn=safeSpawn;
         Bukkit.getScheduler().runTask(this,()->{
             if(!player.isOnline() || !active) return;
-            if(lives.getOrDefault(player.getUniqueId(),0)<=0) player.setGameMode(GameMode.SPECTATOR);
+            if(lives.getOrDefault(player.getUniqueId(),0)<=0 || !hasSafeSpawn) player.setGameMode(GameMode.SPECTATOR);
             else player.setGameMode(GameMode.SURVIVAL);
         });
     }
