@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class ChallengeCommand implements CommandExecutor,TabCompleter {
     private static final List<String> COMMANDS=List.of("build","pos1","pos2","save","start","reset",
-            "pause","resume","event","stats","stop","reload");
+            "pause","resume","event","stats","stop","reload","difficulty","loot");
     private final SkyChaos plugin;
 
     public ChallengeCommand(SkyChaos plugin) {
@@ -22,11 +22,11 @@ public final class ChallengeCommand implements CommandExecutor,TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         if(args.length==0) {
-            sender.sendMessage("§bSkyChaos §7- /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats|stop|reload>");
+            sender.sendMessage("§bSkyChaos §7- /challenge <start|reset|difficulty|loot|pause|resume|event|stats|stop>");
             return true;
         }
         String sub=args[0].toLowerCase();
-        boolean admin=List.of("build","pos1","pos2","save","reload").contains(sub);
+        boolean admin=List.of("build","pos1","pos2","save","reload","difficulty").contains(sub);
         String permission=admin?"skychaos.admin":"skychaos.play";
         if(!sender.hasPermission(permission) && !sender.hasPermission("skychaos.admin")) {
             sender.sendMessage("§cDafür fehlt die Berechtigung "+permission+".");
@@ -128,6 +128,20 @@ public final class ChallengeCommand implements CommandExecutor,TabCompleter {
                 plugin.reloadPluginConfigs();
                 sender.sendMessage("§aSkyChaos-Konfigurationen neu geladen.");
             }
+            case "difficulty" -> {
+                if(args.length==1) {
+                    sender.sendMessage("§bAktuelle Schwierigkeit: §f"+plugin.getDifficultyManager().get());
+                    sender.sendMessage("§7Ändern: /challenge difficulty <easy|medium|hard>");
+                } else if(args.length==2) {
+                    if(plugin.getDifficultyManager().set(args[1])) {
+                        sender.sendMessage("§aSchwierigkeit auf §f"+plugin.getDifficultyManager().get()+" §agesetzt.");
+                        sender.sendMessage("§7Die neuen Werte gelten ab dem nächsten Event und der nächsten Loot-Generierung.");
+                    } else sender.sendMessage("§cNutze easy, medium oder hard.");
+                } else sender.sendMessage("§cNutze /challenge difficulty <easy|medium|hard>.");
+            }
+            case "loot" -> sender.sendMessage("§bLoot-Inseln: §f"+plugin.getLootIslandManager().size()
+                    +" §7| Schwierigkeit: §f"+plugin.getDifficultyManager().get()
+                    +" §7| Loot-Multiplikator: §f"+plugin.getDifficultyManager().lootMultiplier()+"x");
             default -> sender.sendMessage("§cUnbekannter Unterbefehl. Nutze /challenge.");
         }
         return true;
@@ -140,6 +154,8 @@ public final class ChallengeCommand implements CommandExecutor,TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender,Command command,String alias,String[] args) {
+        if(args.length==2 && args[0].equalsIgnoreCase("difficulty")) return List.of("easy","medium","hard").stream()
+                .filter(value->value.startsWith(args[1].toLowerCase())).toList();
         if(args.length==1) return COMMANDS.stream()
                 .filter(value->value.startsWith(args[0].toLowerCase()))
                 .filter(value->sender.hasPermission(List.of("build","pos1","pos2","save","reload").contains(value)
