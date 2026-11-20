@@ -49,7 +49,7 @@ public final class EventManager {
         double chance=Math.max(0.0,Math.min(1.0,plugin.getConfig().getDouble("double-event-chance",0.10)));
         if(minutes>=doubleAfter && plugin.getConfigManager().getBoolean("events.double-event.enabled",true)
                 && ThreadLocalRandom.current().nextDouble()<chance) {
-            List<String> second=availableCategories(minutes,protectedPhase);
+            List<String> second=new ArrayList<>(availableCategories(minutes,protectedPhase).stream().distinct().toList());
             second.remove(selected);
             if(!second.isEmpty() && runCategory(choose(second),target)) survivedEvents++;
         }
