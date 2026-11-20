@@ -1,53 +1,66 @@
-# SkyChaos
+# SkyChaos 2.0.0
 
-SkyBlock-Challenge-Plugin für Paper 26.3 mit Java 26 und Maven.
+SkyChaos is a configurable SkyBlock challenge plugin for Paper 26.3, built with Java 25 and Maven. It has no runtime dependencies beyond the Paper API.
 
-## Voraussetzungen
+## Requirements
 
-- JDK 26
-- Maven 3.9+
 - Paper 26.3
-
-Paper 26.3 benötigt Java 25 oder neuer. Das Projekt wird mit JDK 26 gebaut und verwendet Java 25 als Bytecode-Ziel, damit der erzeugte Plugin-Code auf der Paper-26.3-Laufzeit kompatibel bleibt.
+- Java 25 runtime
+- Maven 3.9+ and JDK 25 to build
 
 ## Build
 
 ```bash
-mvn clean package
+mvn --batch-mode clean verify
 ```
 
-Die Plugin-Datei liegt danach unter `target/SkyChaos-1.0.0.jar`.
+The artifact is written to `target/SkyChaos.jar`. GitHub Actions builds the project with Temurin Java 25 and uploads the jar as a workflow artifact.
 
 ## Installation
 
-1. Die JAR in den Ordner `plugins` des Paper-26.3-Servers kopieren.
-2. Den Server starten.
-3. In `server.properties` `spawn-protection=0` setzen und den Server neu starten, damit Vanilla-Spawn-Schutz deaktiviert ist.
-4. Die Welt `skychaos` wird beim ersten Start als Void-Welt erstellt.
-5. Im Spiel die Insel im Creative-Modus bauen.
-6. Mit `/challenge pos1` und `/challenge pos2` die beiden Ecken markieren.
-7. Mit `/challenge save` die Insel sichern.
-8. Mit `/challenge start` die Challenge starten.
+1. Copy `target/SkyChaos.jar` into the server's `plugins` folder.
+2. Set `spawn-protection=0` in `server.properties` and restart the server. Spawn protection is controlled by the server, not by plugin code.
+3. Start Paper. SkyChaos creates the configured world (default: `skychaos`) with a void generator.
+4. Join the void world and run `/challenge build`.
+5. Build the starter island in Creative.
+6. Mark the two opposite corners with `/challenge pos1` and `/challenge pos2`.
+7. Save the template with `/challenge save`.
+8. Start the challenge with `/challenge start`.
 
-Die gespeicherte Insel liegt unter `plugins/SkyChaos/islands/starter-island.yml`.
+The island template is stored in `plugins/SkyChaos/islands/starter-island.yml`. Container inventories and block data are included in the snapshot.
 
 ## Commands
 
-| Command | Beschreibung | Permission |
+| Command | Description | Permission |
 |---|---|---|
-| `/challenge build` | Build-Modus starten | `skychaos.admin` |
-| `/challenge pos1` | Erste Ecke markieren | `skychaos.admin` |
-| `/challenge pos2` | Zweite Ecke markieren | `skychaos.admin` |
-| `/challenge save` | Insel speichern | `skychaos.admin` |
-| `/challenge start` | Challenge starten | `skychaos.play` |
-| `/challenge reset` | Challenge neu starten | `skychaos.play` |
-| `/challenge pause` | Challenge pausieren | `skychaos.play` |
-| `/challenge resume` | Challenge fortsetzen | `skychaos.play` |
-| `/challenge event` | Test-Event auslösen | `skychaos.play` |
-| `/challenge stats` | Statistiken anzeigen | `skychaos.play` |
+| `/challenge build` | Enter island build mode | `skychaos.admin` |
+| `/challenge pos1` | Mark first selection corner | `skychaos.admin` |
+| `/challenge pos2` | Mark second selection corner | `skychaos.admin` |
+| `/challenge save` | Save island template | `skychaos.admin` |
+| `/challenge start` | Start challenge | `skychaos.play` |
+| `/challenge reset` | Restore island and restart | `skychaos.play` |
+| `/challenge pause` | Pause timer and event effects | `skychaos.play` |
+| `/challenge resume` | Resume challenge | `skychaos.play` |
+| `/challenge event` | Trigger a test event | `skychaos.play` |
+| `/challenge stats` | Show challenge statistics | `skychaos.play` |
+| `/challenge stop` | Stop and return players to spectator | `skychaos.play` |
+| `/challenge reload` | Reload plugin configuration | `skychaos.admin` |
 
-## Konfiguration
+## Configuration
 
-- `config.yml`: Timer, Spawn, Leben, Starter-Kit und Insel-Limits.
-- `events.yml`: Event-Kategorien, Aktivierung und Gewichte.
-- `.github/workflows/build.yml`: automatischer Maven-Build bei Push und Pull Request.
+- `config.yml`: world, island spawn, timer, protection phase, difficulty scaling, lives, starter kit and safety limits.
+- `events.yml`: category weights, event weights, enable switches and event-specific values.
+
+Event categories are weighted as GOOD 40, NEUTRAL 30 and BAD 30 by default. BAD events are excluded during the configured protection phase. After the difficulty threshold, BAD category weight is doubled. CHAOS events unlock after the double-event threshold. A second category can be rolled with the configured probability.
+
+## Safety
+
+- Event entity spawns are capped and restricted to valid island surfaces.
+- Explosions do not destroy island blocks while a challenge is active.
+- Liquid flow and fire are prevented from escaping the island area.
+- Temporary entities, blocks, potion effects and fire rules are cleaned up on pause, stop, reset and plugin shutdown.
+- Island snapshots validate dimensions and block coordinates before restoration.
+
+## CI
+
+The workflow at `.github/workflows/build.yml` runs Maven verification on Java 25 for pushes and pull requests.
