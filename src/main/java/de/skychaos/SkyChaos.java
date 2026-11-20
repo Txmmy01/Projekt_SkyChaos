@@ -297,7 +297,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         }
     }
 
-    public void resetChallenge() {
+    public void reloadPluginConfigs() {\n        reloadConfig();\n        eventsConfig=YamlConfiguration.loadConfiguration(new File(getDataFolder(),"events.yml"));\n    }\n\n    public void resetChallenge() {
         startChallenge(false);
     }
 
