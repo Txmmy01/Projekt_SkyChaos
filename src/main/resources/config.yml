@@ -1,0 +1,26 @@
+timer-seconds: 120
+schutz-phase-minuten: 5
+allow-double-events-ab-minute: 60
+difficulty-scale-minutes: 30
+island-world: skychaos
+island-spawn:
+  x: 0.5
+  y: 80.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+lives: 3
+starter-kit:
+  - material: OAK_SAPLING
+    amount: 1
+  - material: DIRT
+    amount: 3
+  - material: OAK_LOG
+    amount: 2
+  - material: LAVA_BUCKET
+    amount: 1
+  - material: WATER_BUCKET
+    amount: 1
+island:
+  max-blocks: 50000
+  max-radius: 128
