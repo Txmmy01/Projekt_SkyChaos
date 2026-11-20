@@ -76,8 +76,13 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage("§cEs wurde noch keine Insel gespeichert.");
                     return true;
                 }
-                plugin.resetChallenge();
-                sender.sendMessage("§aChallenge zurückgesetzt.");
+                try {
+                    plugin.resetChallenge();
+                    sender.sendMessage("§aChallenge zurückgesetzt.");
+                } catch(RuntimeException exception) {
+                    sender.sendMessage("§cReset fehlgeschlagen: "+exception.getMessage());
+                    plugin.getLogger().severe("Challenge-Reset fehlgeschlagen: "+exception.getMessage());
+                }
             }
             case "pause" -> {
                 plugin.pauseChallenge();
