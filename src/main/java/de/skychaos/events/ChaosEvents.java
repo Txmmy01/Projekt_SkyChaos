@@ -24,11 +24,16 @@ public final class ChaosEvents extends RandomEvent {
     private World fireWorld;
     private Integer previousFireSpreadRadius;
 
-    @Override
-    public void cleanup() {
-        if(fireWorld!=null && previousFireSpreadRadius!=null) fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
+    private void restoreFireRule() {
+        if(fireWorld!=null && previousFireSpreadRadius!=null)
+            fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
         fireWorld=null;
         previousFireSpreadRadius=null;
+    }
+
+    @Override
+    public void cleanup() {
+        restoreFireRule();
         super.cleanup();
     }
 
@@ -56,8 +61,8 @@ public final class ChaosEvents extends RandomEvent {
         world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,0);
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
         schedule(()->{
-            for(var flame:flames) if(flame.getType()==Material.FIRE) flame.setType(Material.AIR,false);
-            cleanup();
+            for(var flame:flames) restoreTemporaryBlock(flame);
+            restoreFireRule();
         },value("fire-storm","duration",10)*20L);
     }
 
