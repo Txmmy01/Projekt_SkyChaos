@@ -107,7 +107,9 @@ public final class IslandManager {
         int sy = yaml.getInt("size.y");
         int sz = yaml.getInt("size.z");
         if (sx < 1 || sy < 1 || sz < 1) throw new IllegalStateException("Die gespeicherte Insel ist ungültig.");
-        for (int x=0; x<sx; x++) for (int y=0; y<sy; y++) for (int z=0; z<sz; z++) world.getBlockAt(ox+x,oy+y,oz+z).setType(Material.AIR, false);
+        for(int x=0;x<sx;x++) for(int y=0;y<sy+16 && oy+y<world.getMaxHeight();y++) for(int z=0;z<sz;z++) {
+            world.getBlockAt(ox+x,oy+y,oz+z).setType(Material.AIR,false);
+        }
         for (Map<?, ?> entry : yaml.getMapList("blocks")) {
             int x = ox + ((Number)entry.get("x")).intValue();
             int y = oy + ((Number)entry.get("y")).intValue();
