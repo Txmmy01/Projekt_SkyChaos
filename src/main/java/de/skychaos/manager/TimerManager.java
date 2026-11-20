@@ -58,6 +58,8 @@ public final class TimerManager {
         for (Player player : Bukkit.getOnlinePlayers()) if (!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
     }
 
+    public void addPlayer(Player player) { bossBar.addPlayer(player); updateBar(); }
+
     public void pause() {
         paused = true;
     }
