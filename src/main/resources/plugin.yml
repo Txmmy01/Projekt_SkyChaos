@@ -1,9 +1,9 @@
 name: SkyChaos
-version: 2.0.0
+version: 2.1.0
 main: de.skychaos.SkyChaos
 api-version: '26.3'
 authors: [Txmmy01]
-description: Configurable SkyBlock challenge with timed random events
+description: Ready-to-play Skyblock chaos challenge with void dimensions, loot islands and timed events
 commands:
   challenge:
     description: Verwaltet die SkyChaos-Challenge
