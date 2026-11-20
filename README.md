@@ -22,11 +22,12 @@ Die Plugin-Datei liegt danach unter `target/SkyChaos-1.0.0.jar`.
 
 1. Die JAR in den Ordner `plugins` des Paper-26.3-Servers kopieren.
 2. Den Server starten.
-3. Die Welt `skychaos` wird beim ersten Start als Void-Welt erstellt.
-4. Im Spiel die Insel im Creative-Modus bauen.
-5. Mit `/challenge pos1` und `/challenge pos2` die beiden Ecken markieren.
-6. Mit `/challenge save` die Insel sichern.
-7. Mit `/challenge start` die Challenge starten.
+3. In `server.properties` `spawn-protection=0` setzen und den Server neu starten, damit Vanilla-Spawn-Schutz deaktiviert ist.
+4. Die Welt `skychaos` wird beim ersten Start als Void-Welt erstellt.
+5. Im Spiel die Insel im Creative-Modus bauen.
+6. Mit `/challenge pos1` und `/challenge pos2` die beiden Ecken markieren.
+7. Mit `/challenge save` die Insel sichern.
+8. Mit `/challenge start` die Challenge starten.
 
 Die gespeicherte Insel liegt unter `plugins/SkyChaos/islands/starter-island.yml`.
 
