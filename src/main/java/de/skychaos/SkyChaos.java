@@ -212,15 +212,24 @@ public final class SkyChaos extends JavaPlugin implements Listener {
                 && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
+    private boolean isNetherPortalInterior(org.bukkit.Location location) {
+        return location.getWorld().equals(islandManager.getWorld())
+                && location.getBlockX()>=19 && location.getBlockX()<=20
+                && location.getBlockY()>=81 && location.getBlockY()<=83
+                && location.getBlockZ()==0;
+    }
+
     @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
         if(active && event.getBlock().getWorld().equals(islandManager.getWorld())
-                && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+                && !islandManager.contains(event.getBlock().getLocation())
+                && !isNetherPortalInterior(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event) {
-        if(active && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+        if(active && event.getBlock().getWorld().equals(islandManager.getWorld())
+                && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
