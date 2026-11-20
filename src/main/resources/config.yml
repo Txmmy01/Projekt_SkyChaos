@@ -1,7 +1,11 @@
+settings:
+  debug: false
+  locale: de
 timer-seconds: 120
 schutz-phase-minuten: 5
-allow-double-events-ab-minute: 60
 difficulty-scale-minutes: 30
+allow-double-events-ab-minute: 60
+double-event-chance: 0.10
 island-world: skychaos
 island-spawn:
   x: 0.5
@@ -19,3 +23,8 @@ starter-kit:
 island:
   max-blocks: 50000
   max-radius: 128
+  cleanup-height: 32
+events:
+  max-entities: 40
+  max-dropped-items: 80
+  safe-spawn-attempts: 24
