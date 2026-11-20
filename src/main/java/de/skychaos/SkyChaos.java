@@ -424,7 +424,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
                 int remaining=previous.getDuration()-elapsed;
                 if(remaining>0) {
                     player.addPotionEffect(new PotionEffect(type,remaining,previous.getAmplifier(),
-                            previous.isAmbient(),previous.hasParticles(),previous.hasIcon()),true);
+                            previous.isAmbient(),previous.hasParticles(),previous.hasIcon()));
                 }
             }
         }
