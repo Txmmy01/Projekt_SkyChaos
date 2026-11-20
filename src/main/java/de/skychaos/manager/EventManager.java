@@ -70,7 +70,7 @@ public final class EventManager {
     private void addCategory(List<String> result,String category,int multiplier) {
         String path="categories."+category;
         if(!plugin.getConfigManager().getBoolean(path+".enabled",true)) return;
-        int weight=Math.max(0,plugin.getConfigManager().getInt(path+".weight",0))*multiplier;
+        int weight=Math.min(1000,Math.max(0,plugin.getConfigManager().getInt(path+".weight",0)))*multiplier;
         for(int i=0;i<weight;i++) result.add(category);
     }
 
