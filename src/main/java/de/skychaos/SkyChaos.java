@@ -41,6 +41,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private int deaths;
     private long noBuildUntil;
     private long xpBoostUntil;
+    private int xpBoostMultiplier=2;
 
     @Override
     public void onEnable() {
@@ -145,7 +146,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onExpChange(PlayerExpChangeEvent event) {
-        if(active && !paused && System.currentTimeMillis()<xpBoostUntil) event.setAmount(event.getAmount()*2);
+        if(active && !paused && System.currentTimeMillis()<xpBoostUntil) event.setAmount(event.getAmount()*xpBoostMultiplier);
     }
 
     public void prepareIdlePlayer(Player player) {
@@ -237,5 +238,5 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public YamlConfiguration getConfigManager() { return eventsConfig; }
     public int getDeaths() { return deaths; }
     public void setNoBuildUntil(long timestamp) { noBuildUntil=timestamp; }
-    public void startXpBoost(int seconds) { xpBoostUntil=System.currentTimeMillis()+seconds*1000L; }
+    public void startXpBoost(int seconds,int multiplier) { xpBoostUntil=System.currentTimeMillis()+seconds*1000L; xpBoostMultiplier=Math.max(1,multiplier); }
 }
