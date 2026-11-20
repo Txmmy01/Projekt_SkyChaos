@@ -162,6 +162,10 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     }
 
     public void startChallenge(boolean intro) {
+        eventManager.cleanup();
+        for(org.bukkit.entity.Entity entity:islandManager.getWorld().getEntities()) {
+            if(!(entity instanceof Player) && islandManager.contains(entity.getLocation())) entity.remove();
+        }
         islandManager.restore();
         active=true;
         paused=false;
@@ -169,6 +173,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         noBuildUntil=0L;
         xpBoostUntil=0L;
         deaths=0;
+        eventManager.resetStats();
         lives.clear();
         for(Player player:Bukkit.getOnlinePlayers()) {
             lives.put(player.getUniqueId(),getConfig().getInt("lives",3));
