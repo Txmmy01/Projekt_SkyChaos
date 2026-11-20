@@ -1,7 +1,10 @@
 package de.skychaos.events;
 
 import de.skychaos.SkyChaos;
-import org.bukkit.Bukkit;
+import de.skychaos.SkyChaos;
+import org.bukkit.attribute.Attribute;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -61,7 +64,7 @@ public final class GoodEvents extends RandomEvent {
         Location location=safeLocation();
         if(location==null) return;
         Villager villager=player.getWorld().spawn(location,Villager.class);
-        villager.setCustomName("§bSkyChaos-Händler");
+        villager.customName(Component.text("SkyChaos-Händler",NamedTextColor.AQUA));
         villager.setCustomNameVisible(true);
         villager.setAI(false);
         villager.setInvulnerable(true);
@@ -77,7 +80,8 @@ public final class GoodEvents extends RandomEvent {
 
     public void fullHeal(Player player) {
         if(!enabled("full-heal")) return;
-        player.setHealth(player.getMaxHealth());
+        var maxHealth=player.getAttribute(Attribute.MAX_HEALTH);
+        if(maxHealth!=null) player.setHealth(maxHealth.getValue());
         player.setFoodLevel(20);
         player.setSaturation(20);
         announce("Volle Heilung");
@@ -105,6 +109,6 @@ public final class GoodEvents extends RandomEvent {
     }
 
     private void announce(String event) {
-        Bukkit.broadcastMessage("§a§lGOOD EVENT §8» §f"+event);
+        SkyChaos.broadcastLegacy("§a§lGOOD EVENT §8» §f"+event);
     }
 }
