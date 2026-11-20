@@ -8,6 +8,10 @@ import de.skychaos.world.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.GameRules;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.persistence.PersistentDataType;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -63,10 +67,12 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private record EffectSnapshot(PotionEffect previous,long capturedAt,int appliedAmplifier,long expiresAt) { }
     private Boolean previousMobGriefing;
     private Boolean previousMobSpawning;
+    private NamespacedKey giantSlimeKey;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        giantSlimeKey=new NamespacedKey(this,"giant_slime");
         saveResourceIfMissing("events.yml");
         loadEventsConfig();
         String worldName=getConfig().getString("island-world","skychaos");
@@ -275,7 +281,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     @EventHandler
     public void onGiantSlimeDeath(EntityDeathEvent event) {
         if(event.getEntity() instanceof org.bukkit.entity.Slime slime
-                && "SkyChaos Giant Slime".equals(slime.getCustomName())) {
+                && slime.getPersistentDataContainer().has(giantSlimeKey,PersistentDataType.BYTE)) {
             event.getDrops().add(new org.bukkit.inventory.ItemStack(Material.DIAMOND,2));
             event.getDrops().add(new org.bukkit.inventory.ItemStack(Material.EMERALD,4));
             event.setDroppedExp(event.getDroppedExp()+25);
@@ -332,14 +338,15 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             player.setAllowFlight(false);
             player.setFlying(false);
             player.setFireTicks(0);
-            player.setHealth(player.getMaxHealth());
+            var maxHealth=player.getAttribute(Attribute.MAX_HEALTH);
+            if(maxHealth!=null) player.setHealth(maxHealth.getValue());
             player.setFoodLevel(20);
             player.setSaturation(20);
             player.teleport(challengeSpawn);
             giveStarterKit(player);
         }
         timerManager.start();
-        if(intro) Bukkit.broadcastMessage("§b§lSkyChaos §7- Die Challenge beginnt!");
+        if(intro) broadcastLegacy("§b§lSkyChaos §7- Die Challenge beginnt!");
     }
 
     private void giveStarterKit(Player player) {
@@ -392,7 +399,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             old=new EffectSnapshot(old.previous(),old.capturedAt(),effect.getAmplifier(),now+effect.getDuration()*50L);
         }
         snapshots.put(effect.getType(),old);
-        player.addPotionEffect(effect,true);
+        player.addPotionEffect(effect);
     }
 
     private void clearTemporaryEffects() {
@@ -468,6 +475,14 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         player.setAllowFlight(true);
         player.setFlying(true);
         player.teleport(islandManager.getWorld().getSpawnLocation());
+    }
+
+    public static void broadcastLegacy(String message) {
+        Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(message));
+    }
+
+    public void markGiantSlime(org.bukkit.entity.Slime slime) {
+        slime.getPersistentDataContainer().set(giantSlimeKey,PersistentDataType.BYTE,(byte)1);
     }
 
     public boolean isActive() { return active; }
