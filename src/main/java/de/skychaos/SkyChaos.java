@@ -3,6 +3,9 @@ package de.skychaos;
 import de.skychaos.commands.ChallengeCommand;
 import de.skychaos.manager.EventManager;
 import de.skychaos.manager.IslandManager;
+import de.skychaos.manager.DifficultyManager;
+import de.skychaos.manager.LootIslandManager;
+import de.skychaos.manager.WorldSetupManager;
 import de.skychaos.manager.TimerManager;
 import de.skychaos.world.VoidGenerator;
 import org.bukkit.Bukkit;
@@ -38,6 +41,8 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,6 +58,9 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private IslandManager islandManager;
     private TimerManager timerManager;
     private EventManager eventManager;
+    private DifficultyManager difficultyManager;
+    private LootIslandManager lootIslandManager;
+    private WorldSetupManager worldSetupManager;
     private YamlConfiguration eventsConfig;
     private final Map<UUID,Integer> lives=new HashMap<>();
     private final Map<UUID,Map<PotionEffectType,EffectSnapshot>> effectSnapshots=new HashMap<>();
@@ -90,6 +98,24 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         }
         world.setSpawnLocation(0,80,0);
         islandManager=new IslandManager(this,world);
+        try {
+            islandManager.createDefaultStarterIsland();
+        } catch(java.io.IOException exception) {
+            getLogger().severe("Die Standard-Starterinsel konnte nicht erstellt werden: "+exception.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        difficultyManager=new DifficultyManager(this);
+        worldSetupManager=new WorldSetupManager(this,world);
+        try {
+            worldSetupManager.setup();
+        } catch(RuntimeException exception) {
+            getLogger().severe("Die SkyChaos-Dimensionen konnten nicht eingerichtet werden: "+exception.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        lootIslandManager=new LootIslandManager(this,world);
+        if(lootIslandManager.size()==0 && difficultyManager.chestCount()>0) lootIslandManager.regenerate();
         timerManager=new TimerManager(this);
         eventManager=new EventManager(this);
         ChallengeCommand command=new ChallengeCommand(this);
@@ -156,26 +182,22 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if(active && (paused || System.currentTimeMillis()<noBuildUntil
-                || !islandManager.contains(event.getBlock().getLocation()))) event.setCancelled(true);
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil)) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(active && (paused || System.currentTimeMillis()<noBuildUntil
-                || !islandManager.contains(event.getBlockPlaced().getLocation()))) event.setCancelled(true);
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil)) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBucketEmpty(PlayerBucketEmptyEvent event) {
-        if(active && (paused || System.currentTimeMillis()<noBuildUntil
-                || !islandManager.contains(event.getBlock().getLocation()))) event.setCancelled(true);
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil)) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBucketFill(PlayerBucketFillEvent event) {
-        if(active && (paused || System.currentTimeMillis()<noBuildUntil
-                || !islandManager.contains(event.getBlock().getLocation()))) event.setCancelled(true);
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil)) event.setCancelled(true);
     }
 
     @EventHandler
@@ -230,19 +252,34 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        if(!active || !worldSetupManager.isChallengeWorld(event.getFrom().getWorld())) return;
+        World from=event.getFrom().getWorld();
+        World destination=null;
+        if(from.equals(worldSetupManager.getOverworld())) {
+            if(event.getCause()==PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) destination=worldSetupManager.getNether();
+            if(event.getCause()==PlayerTeleportEvent.TeleportCause.END_PORTAL) destination=worldSetupManager.getEnd();
+        } else if(from.equals(worldSetupManager.getNether()) || from.equals(worldSetupManager.getEnd())) {
+            destination=worldSetupManager.getOverworld();
+        }
+        if(destination!=null) {
+            event.setTo(worldSetupManager.getSpawn(destination));
+            event.setCanCreatePortal(false);
+        }
+    }
+
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if(!active || paused || event.getTo()==null || event.getTo().getWorld()==null
-                || !event.getTo().getWorld().equals(islandManager.getWorld())) return;
-        if(event.getTo().getY()<islandManager.getWorld().getMinHeight()+2) {
-            event.getPlayer().teleport(resolveChallengeSpawn(event.getPlayer()));
-            return;
+                || !worldSetupManager.isChallengeWorld(event.getTo().getWorld())) return;
+        if(event.getTo().getY()<event.getTo().getWorld().getMinHeight()+2) {
+            event.getPlayer().teleport(worldSetupManager.getSpawn(event.getTo().getWorld()));
         }
-        if(!islandManager.contains(event.getTo())) event.setTo(event.getFrom());
     }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if(!active || !event.getEntity().getWorld().equals(islandManager.getWorld())) return;
+        if(!active || !worldSetupManager.isChallengeWorld(event.getEntity().getWorld())) return;
         Player player=event.getEntity();
         deaths++;
         int remaining=lives.getOrDefault(player.getUniqueId(),getConfig().getInt("lives",3))-1;
@@ -258,10 +295,10 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         boolean safeSpawn=true;
         org.bukkit.Location respawnLocation;
         try {
-            respawnLocation=islandManager.getSpawnLocation();
+            respawnLocation=worldSetupManager.getSpawn(player.getWorld());
         } catch(IllegalStateException exception) {
             safeSpawn=false;
-            respawnLocation=islandManager.getWorld().getSpawnLocation();
+            respawnLocation=worldSetupManager.getOverworld().getSpawnLocation();
         }
         event.setRespawnLocation(respawnLocation);
         boolean hasSafeSpawn=safeSpawn;
@@ -296,7 +333,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     private org.bukkit.Location resolveChallengeSpawn(Player player) {
         try {
-            return islandManager.getSpawnLocation();
+            return worldSetupManager.getSpawn(player.getWorld());
         } catch(IllegalStateException exception) {
             player.setGameMode(GameMode.SPECTATOR);
             player.setAllowFlight(true);
@@ -316,10 +353,13 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public void startChallenge(boolean intro) {
         if(!islandManager.exists()) throw new IllegalStateException("Es wurde noch keine Starter-Insel gespeichert.");
         eventManager.cleanup();
+        worldSetupManager.setup();
         for(Entity entity:islandManager.getWorld().getEntities()) {
             if(!(entity instanceof Player) && islandManager.contains(entity.getLocation())) entity.remove();
         }
         islandManager.restore();
+        worldSetupManager.setup();
+        lootIslandManager.regenerate();
         org.bukkit.Location challengeSpawn=islandManager.getSpawnLocation();
         active=true;
         paused=false;
@@ -494,6 +534,10 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public EventManager getEventManager() { return eventManager; }
     public YamlConfiguration getConfigManager() { return eventsConfig; }
     public int getDeaths() { return deaths; }
+public DifficultyManager getDifficultyManager() { return difficultyManager; }
+    public LootIslandManager getLootIslandManager() { return lootIslandManager; }
+    public WorldSetupManager getWorldSetupManager() { return worldSetupManager; }
+    public int getEventIntervalSeconds() { return difficultyManager==null?getConfig().getInt("timer-seconds",120):difficultyManager.eventInterval(); }
     public void setNoBuildUntil(long timestamp) { noBuildUntil=timestamp; }
     public void startXpBoost(int seconds,int multiplier) {
         xpBoostUntil=System.currentTimeMillis()+Math.max(1,seconds)*1000L;
