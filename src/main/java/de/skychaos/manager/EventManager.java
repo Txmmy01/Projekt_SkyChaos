@@ -41,7 +41,7 @@ public final class EventManager {
         List<String> categories=new ArrayList<>();
         addCategory(categories,"GOOD",1);
         addCategory(categories,"NEUTRAL",1);
-        if(!protection) addCategory(categories,"BAD",minutes>=30?2:1);
+        if(!protection) addCategory(categories,"BAD",minutes>=plugin.getConfig().getInt("difficulty-scale-minutes",30)?2:1);
         if(minutes>=60) addCategory(categories,"CHAOS",1);
         if(categories.isEmpty()) return;
         String category=categories.get(ThreadLocalRandom.current().nextInt(categories.size()));
