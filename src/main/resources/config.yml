@@ -11,16 +11,11 @@ island-spawn:
   pitch: 0.0
 lives: 3
 starter-kit:
-  - material: OAK_SAPLING
-    amount: 1
-  - material: DIRT
-    amount: 3
-  - material: OAK_LOG
-    amount: 2
-  - material: LAVA_BUCKET
-    amount: 1
-  - material: WATER_BUCKET
-    amount: 1
+  - OAK_SAPLING:1
+  - DIRT:3
+  - OAK_LOG:2
+  - LAVA_BUCKET:1
+  - WATER_BUCKET:1
 island:
   max-blocks: 50000
   max-radius: 128
