@@ -52,6 +52,8 @@ public final class WorldSetupManager {
             overworld.getBlockAt(x,80,z).setType(Material.AIR,false);
         }
         for(int x=6;x<=15;x++) overworld.getBlockAt(x,80,0).setType(Material.STONE_BRICKS,false);
+        fill(overworld,19,81,0,20,83,0,Material.AIR);
+        fill(overworld,24,80,-1,26,80,1,Material.AIR);
         for(int y=80;y<=84;y++) {
             overworld.getBlockAt(18,y,0).setType(Material.OBSIDIAN,false);
             overworld.getBlockAt(21,y,0).setType(Material.OBSIDIAN,false);
@@ -125,6 +127,15 @@ public final class WorldSetupManager {
         }
         chest(nether,42,80,0,Material.NETHER_BRICK,Material.BLAZE_ROD,Material.GOLD_INGOT,Material.NETHER_WART,Material.DIAMOND);
         chest(nether,31,80,-5,Material.NETHER_BRICK,Material.BLAZE_ROD,Material.OBSIDIAN,Material.GOLD_INGOT);
+        for(int y=80;y<=84;y++) {
+            nether.getBlockAt(-7,y,0).setType(Material.OBSIDIAN,false);
+            nether.getBlockAt(-4,y,0).setType(Material.OBSIDIAN,false);
+        }
+        for(int x=-6;x<=-5;x++) {
+            nether.getBlockAt(x,80,0).setType(Material.OBSIDIAN,false);
+            nether.getBlockAt(x,84,0).setType(Material.OBSIDIAN,false);
+            for(int y=81;y<=83;y++) nether.getBlockAt(x,y,0).setType(Material.NETHER_PORTAL,false);
+        }
         nether.setSpawnLocation(0,81,0);
     }
 
@@ -137,6 +148,7 @@ public final class WorldSetupManager {
         }
         fill(end,45,80,-3,49,80,3,Material.OBSIDIAN);
         chest(end,47,80,0,Material.END_STONE,Material.ENDER_PEARL,Material.END_STONE,Material.CHORUS_FRUIT,Material.DIAMOND);
+        fill(end,6,80,-1,8,80,1,Material.END_PORTAL);
         end.setSpawnLocation(0,81,0);
     }
 
