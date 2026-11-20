@@ -35,7 +35,7 @@ public final class EventManager {
         Player player=Bukkit.getOnlinePlayers().stream()
                 .filter(p->p.getGameMode()==org.bukkit.GameMode.SURVIVAL)
                 .findFirst().orElse(null);
-        if(player==null || !plugin.isActive() || plugin.isPaused()) return;
+        if(player==null || !plugin.isActive() || plugin.isPaused() || !plugin.getIslandManager().hasSurface()) return;
         long minutes=plugin.getTimerManager().getElapsedMinutes();
         boolean protection=minutes<plugin.getConfig().getInt("schutz-phase-minuten",5);
         List<String> categories=new ArrayList<>();
