@@ -42,7 +42,7 @@ public final class GoodEvents extends RandomEvent {
 
     public void xpBoost(Player player) {
         if (!enabled("xp-boost")) return;
-        plugin.startXpBoost(value("xp-boost","duration",60));
+        plugin.startXpBoost(value("xp-boost","duration",60),value("xp-boost","multiplier",2));
         announce("XP-Boost");
     }
 
