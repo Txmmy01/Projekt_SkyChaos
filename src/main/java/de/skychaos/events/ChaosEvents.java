@@ -75,7 +75,7 @@ public final class ChaosEvents extends RandomEvent {
 
     public void wither(Player player) {
         if(!enabled("wither")) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,value("wither","duration",8)*20,0,false,false,true));
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.WITHER,value("wither","duration",8)*20,0,false,false,true));
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fWither-Fluch!");
     }
 
