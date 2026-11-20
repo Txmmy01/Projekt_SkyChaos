@@ -30,6 +30,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -156,6 +158,18 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if(active && (paused || System.currentTimeMillis()<noBuildUntil
                 || !islandManager.contains(event.getBlockPlaced().getLocation()))) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil
+                || !islandManager.contains(event.getBlock().getLocation()))) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBucketFill(PlayerBucketFillEvent event) {
+        if(active && (paused || System.currentTimeMillis()<noBuildUntil
+                || !islandManager.contains(event.getBlock().getLocation()))) event.setCancelled(true);
     }
 
     @EventHandler
