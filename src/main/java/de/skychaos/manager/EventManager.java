@@ -162,9 +162,7 @@ public final class EventManager {
         int count=plugin.getIslandManager().countIslandEntities();
         int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-count);
         int amount=Math.min(plugin.getConfigManager().getInt("events.mob-party.amount",5),available);
-        for(int i=0;i<amount;i++) {
-            var location=plugin.getIslandManager().randomSurfaceLocation();
-            if(location==null) break;
+        for(var location:plugin.getIslandManager().randomSurfaceLocations(amount)) {
             plugin.getIslandManager().trackEventEntity(player.getWorld().spawnEntity(location,types[ThreadLocalRandom.current().nextInt(types.length)]));
         }
         announce("NEUTRAL","Mob-Party");
@@ -181,9 +179,9 @@ public final class EventManager {
 
     private void giantSlime(Player player) {
         if(plugin.getIslandManager().countIslandEntities()>=plugin.getConfig().getInt("events.max-entities",40)) return;
-        var location=plugin.getIslandManager().randomSurfaceLocation();
-        if(location==null) return;
-        var slime=player.getWorld().spawn(location,org.bukkit.entity.Slime.class);
+        var locations=plugin.getIslandManager().randomSurfaceLocations(1);
+        if(locations.isEmpty()) return;
+        var slime=player.getWorld().spawn(locations.getFirst(),org.bukkit.entity.Slime.class);
         slime.setSize(Math.max(2,Math.min(8,plugin.getConfigManager().getInt("events.giant-slime.size",6))));
         slime.setCustomName("SkyChaos Giant Slime");
         slime.setCustomNameVisible(true);
