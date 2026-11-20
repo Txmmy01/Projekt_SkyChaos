@@ -35,7 +35,10 @@ public final class ChaosEvents extends RandomEvent {
     public void fireStorm(Player player) {
         if(!enabled("fire-storm")) return;
         List<org.bukkit.block.Block> flames=new ArrayList<>();
+        int fireLimit=Math.max(0,plugin.getConfigManager().getInt("events.fire-storm.max-fire-blocks",50));
+        int fireCount=0;
         for(var block:plugin.getIslandManager().getIslandBlocks()) {
+            if(fireCount>=fireLimit) break;
             String type=block.getType().name();
             if(type.endsWith("_LOG") || type.endsWith("_WOOD") || type.endsWith("_PLANKS")) {
                 var above=block.getRelative(0,1,0);
@@ -43,6 +46,7 @@ public final class ChaosEvents extends RandomEvent {
                     trackTemporaryBlock(above);
                     above.setType(Material.FIRE,false);
                     flames.add(above);
+                    fireCount++;
                 }
             }
         }
