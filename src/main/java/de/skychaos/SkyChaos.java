@@ -128,7 +128,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         getCommand("challenge").setTabCompleter(command);
         getServer().getPluginManager().registerEvents(this,this);
         for(Player player:Bukkit.getOnlinePlayers()) prepareIdlePlayer(player);
-        getLogger().info("SkyChaos 2.0.0 wurde aktiviert.");
+        getLogger().info("SkyChaos 2.1.0 wurde aktiviert.");
     }
 
     @Override
