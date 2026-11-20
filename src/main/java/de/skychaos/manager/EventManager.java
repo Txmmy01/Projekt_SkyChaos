@@ -72,6 +72,7 @@ public final class EventManager {
         String path="categories."+category;
         if(!plugin.getConfigManager().getBoolean(path+".enabled",true)) return;
         int weight=Math.min(1000,Math.max(0,plugin.getConfigManager().getInt(path+".weight",0)))*multiplier;
+        if(category.equals("BAD")) weight=(int)Math.round(weight*plugin.getDifficultyManager().badEventMultiplier());
         for(int i=0;i<weight;i++) result.add(category);
     }
 
