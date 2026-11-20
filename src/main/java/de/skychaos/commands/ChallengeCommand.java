@@ -26,7 +26,8 @@ public final class ChallengeCommand implements CommandExecutor,TabCompleter {
             return true;
         }
         String sub=args[0].toLowerCase();
-        boolean admin=List.of("build","pos1","pos2","save","reload","difficulty").contains(sub);
+        boolean admin=List.of("build","pos1","pos2","save","reload").contains(sub)
+                || (sub.equals("difficulty") && args.length>=2);
         String permission=admin?"skychaos.admin":"skychaos.play";
         if(!sender.hasPermission(permission) && !sender.hasPermission("skychaos.admin")) {
             sender.sendMessage("§cDafür fehlt die Berechtigung "+permission+".");
