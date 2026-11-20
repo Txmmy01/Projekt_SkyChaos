@@ -1,17 +1,18 @@
 name: SkyChaos
-version: 1.0.0
+version: 2.1.0
 main: de.skychaos.SkyChaos
 api-version: '26.3'
 authors: [Txmmy01]
-description: SkyBlock challenge with timed random events
+description: Ready-to-play Skyblock chaos challenge with void dimensions, loot islands and timed events
 commands:
   challenge:
     description: Verwaltet die SkyChaos-Challenge
-    usage: /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats>
+    usage: /challenge <start|reset|difficulty|loot|pause|resume|event|stats|stop|reload>
+    aliases: [sc]
 permissions:
   skychaos.admin:
-    description: Darf die Insel bearbeiten und speichern
+    description: Darf die Insel erstellen und die Challenge administrieren
     default: op
   skychaos.play:
-    description: Darf die Challenge verwalten
+    description: Darf die Challenge steuern
     default: op

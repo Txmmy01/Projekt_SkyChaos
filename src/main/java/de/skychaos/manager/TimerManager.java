@@ -2,12 +2,15 @@ package de.skychaos.manager;
 
 import de.skychaos.SkyChaos;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.time.Duration;
 
 public final class TimerManager {
     private final SkyChaos plugin;
@@ -18,66 +21,91 @@ public final class TimerManager {
     private boolean paused;
 
     public TimerManager(SkyChaos plugin) {
-        this.plugin = plugin;
-        bossBar = Bukkit.createBossBar("Nächstes Event in: 02:00", BarColor.BLUE, BarStyle.SOLID);
+        this.plugin=plugin;
+        bossBar=Bukkit.createBossBar("Nächstes Event in: 02:00",BarColor.BLUE,BarStyle.SOLID);
+        bossBar.setVisible(false);
     }
 
     public void start() {
         stop();
-        elapsedSeconds = 0;
-        remaining = Math.max(10, plugin.getConfig().getInt("timer-seconds",120));
-        paused = false;
-        for (Player player : Bukkit.getOnlinePlayers()) bossBar.addPlayer(player);
+        elapsedSeconds=0L;
+        remaining=eventInterval();
+        paused=false;
+        for(Player player:Bukkit.getOnlinePlayers()) if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) bossBar.addPlayer(player);
+        bossBar.setVisible(true);
         updateBar();
-        task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 20L, 20L);
+        task=Bukkit.getScheduler().runTaskTimer(plugin,this::tick,20L,20L);
+    }
+
+    private int eventInterval() {
+        return plugin.getEventIntervalSeconds();
     }
 
     private void tick() {
-        if (!plugin.isActive() || plugin.isPaused() || paused) return;
+        if(!plugin.isActive() || plugin.isPaused() || paused) return;
         elapsedSeconds++;
-        remaining--;
-        if (remaining <= 5 && remaining > 0) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.showTitle(net.kyori.adventure.title.Title.title(
-                        Component.text("In " + remaining + "s passiert was..."),
-                        Component.empty()));
+        if(remaining>0) remaining--;
+        if(remaining<=5 && remaining>0) {
+            for(Player player:Bukkit.getOnlinePlayers()) {
+                if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) {
+                    player.showTitle(Title.title(Component.text("In "+remaining+"s passiert was..."),
+                            Component.empty(),Title.Times.times(Duration.ZERO,Duration.ofSeconds(1),Duration.ofMillis(200))));
+                }
             }
         }
         updateBar();
-        if (remaining <= 0) {
+        if(remaining<=0) {
             plugin.getEventManager().triggerRandom();
-            remaining = Math.max(10, plugin.getConfig().getInt("timer-seconds",120));
+            remaining=eventInterval();
+            updateBar();
         }
     }
 
     private void updateBar() {
-        int total = Math.max(10, plugin.getConfig().getInt("timer-seconds",120));
-        bossBar.setProgress(Math.max(0.0, Math.min(1.0, (double)remaining/total)));
-        bossBar.setColor(remaining <= 10 ? BarColor.RED : BarColor.BLUE);
-        bossBar.setTitle(String.format("Nächstes Event in: %02d:%02d", remaining/60, remaining%60));
-        for (Player player : Bukkit.getOnlinePlayers()) if (!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
+        int total=eventInterval();
+        bossBar.setProgress(Math.max(0.0,Math.min(1.0,(double)remaining/total)));
+        bossBar.setColor(remaining<=10?BarColor.RED:BarColor.BLUE);
+        bossBar.setTitle(String.format("Nächstes Event in: %02d:%02d",remaining/60,remaining%60));
+        for(Player player:Bukkit.getOnlinePlayers()) {
+            if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) {
+                if(!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
+            } else if(bossBar.getPlayers().contains(player)) {
+                bossBar.removePlayer(player);
+            }
+        }
     }
 
-    public void addPlayer(Player player) { bossBar.addPlayer(player); updateBar(); }
+    public void addPlayer(Player player) {
+        if(task!=null && !task.isCancelled() && plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) bossBar.addPlayer(player);
+        updateBar();
+    }
+
+    public void removePlayer(Player player) {
+        bossBar.removePlayer(player);
+    }
 
     public void pause() {
-        paused = true;
+        paused=true;
+        bossBar.setVisible(false);
     }
 
     public void resume() {
-        paused = false;
+        paused=false;
+        bossBar.setVisible(true);
+        updateBar();
     }
 
     public void stop() {
-        if (task != null) {
+        if(task!=null) {
             task.cancel();
-            task = null;
+            task=null;
         }
         bossBar.removeAll();
-        paused = false;
+        bossBar.setVisible(false);
+        paused=false;
     }
 
     public long getElapsedSeconds() { return elapsedSeconds; }
-    public long getElapsedMinutes() { return elapsedSeconds/60; }
+    public long getElapsedMinutes() { return elapsedSeconds/60L; }
     public int getRemaining() { return remaining; }
 }

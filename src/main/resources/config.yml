@@ -1,11 +1,18 @@
-timer-seconds: 120
+settings:
+  debug: false
+  locale: de
+timer-seconds: 240
 schutz-phase-minuten: 5
-allow-double-events-ab-minute: 60
 difficulty-scale-minutes: 30
+allow-double-events-ab-minute: 60
+double-event-chance: 0.10
 island-world: skychaos
+worlds:
+  nether: skychaos_nether
+  end: skychaos_end
 island-spawn:
   x: 0.5
-  y: 80.0
+  y: 81.0
   z: 0.5
   yaw: 0.0
   pitch: 0.0
@@ -19,3 +26,30 @@ starter-kit:
 island:
   max-blocks: 50000
   max-radius: 128
+  cleanup-height: 32
+loot-islands:
+  min-distance-from-spawn: 40
+  max-distance-from-spawn: 120
+  min-distance-between: 24
+difficulty:
+  current: medium
+  profiles:
+    easy:
+      chest-count: 12
+      loot-multiplier: 1.5
+      bad-event-multiplier: 0.5
+      event-interval: 300
+    medium:
+      chest-count: 8
+      loot-multiplier: 1.0
+      bad-event-multiplier: 1.0
+      event-interval: 240
+    hard:
+      chest-count: 5
+      loot-multiplier: 0.7
+      bad-event-multiplier: 1.8
+      event-interval: 180
+events:
+  max-entities: 40
+  max-dropped-items: 80
+  safe-spawn-attempts: 24

@@ -1,13 +1,17 @@
 package de.skychaos.events;
 
 import de.skychaos.SkyChaos;
-import org.bukkit.Bukkit;
+import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ChaosEvents extends RandomEvent {
     public ChaosEvents(SkyChaos plugin) { super(plugin); }
@@ -16,37 +20,88 @@ public final class ChaosEvents extends RandomEvent {
     @Override public String name() { return "Chaos Events"; }
     @Override public void execute(Player player) { }
 
+    private World fireWorld;
+    private Integer previousFireSpreadRadius;
+
+    private void restoreFireRule() {
+        if(fireWorld!=null && previousFireSpreadRadius!=null)
+            fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
+        fireWorld=null;
+        previousFireSpreadRadius=null;
+    }
+
+    @Override
+    public void cleanup() {
+        restoreFireRule();
+        super.cleanup();
+    }
+
     public void fireStorm(Player player) {
-        if (!enabled("fire-storm")) return;
-        java.util.List<org.bukkit.block.Block> flames=new java.util.ArrayList<>();
+        if(!enabled("fire-storm")) return;
+        List<org.bukkit.block.Block> flames=new ArrayList<>();
+        int fireLimit=Math.max(0,plugin.getConfigManager().getInt("events.fire-storm.max-fire-blocks",50));
+        int fireCount=0;
         for(var block:plugin.getIslandManager().getIslandBlocks()) {
+            if(fireCount>=fireLimit) break;
             String type=block.getType().name();
             if(type.endsWith("_LOG") || type.endsWith("_WOOD") || type.endsWith("_PLANKS")) {
-                org.bukkit.block.Block above=block.getRelative(0,1,0);
+                var above=block.getRelative(0,1,0);
                 if(above.getType().isAir() && plugin.getIslandManager().contains(above.getLocation())) {
+                    trackTemporaryBlock(above);
                     above.setType(Material.FIRE,false);
                     flames.add(above);
+                    fireCount++;
                 }
             }
         }
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
-        Bukkit.getScheduler().runTaskLater(plugin,()->{
-            for(var flame:flames) if(flame.getType()==Material.FIRE) flame.setType(Material.AIR,false);
+        World world=player.getWorld();
+        fireWorld=world;
+        previousFireSpreadRadius=world.getGameRuleValue(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER);
+        world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,0);
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fFeuersturm!");
+        schedule(()->{
+            for(var flame:flames) restoreTemporaryBlock(flame);
+            restoreFireRule();
         },value("fire-storm","duration",10)*20L);
     }
 
     public void endermanInvasion(Player player) {
-        if (!enabled("enderman-invasion")) return;
-        for(int i=0;i<value("enderman-invasion","amount",5);i++) {
-            Location location=plugin.getIslandManager().randomSurfaceLocation();
-            player.getWorld().spawnEntity(location,EntityType.ENDERMAN);
-        }
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fEnderman-Invasion!");
+        if(!enabled("enderman-invasion")) return;
+        spawnMobs(player,value("enderman-invasion","amount",5),EntityType.ENDERMAN);
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fEnderman-Invasion!");
     }
 
     public void noBuild(Player player) {
-        if (!enabled("no-build")) return;
+        if(!enabled("no-build")) return;
         plugin.setNoBuildUntil(System.currentTimeMillis()+value("no-build","duration",20)*1000L);
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fBauen ist vorübergehend deaktiviert!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fBauen ist vorübergehend deaktiviert!");
+    }
+
+    public void wither(Player player) {
+        if(!enabled("wither")) return;
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.WITHER,value("wither","duration",8)*20,0,false,false,true));
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fWither-Fluch!");
+    }
+
+    public void mobSwarm(Player player) {
+        if(!enabled("mob-swarm")) return;
+        EntityType[] types={EntityType.ZOMBIE,EntityType.SKELETON,EntityType.SPIDER};
+        int amount=Math.max(0,value("mob-swarm","amount",8));
+        int current=plugin.getIslandManager().countIslandEntities();
+        int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
+        int spawnAmount=Math.min(amount,available);
+        List<Location> locations=plugin.getIslandManager().randomSurfaceLocations(spawnAmount);
+        for(int i=0;i<locations.size();i++) {
+            track(player.getWorld().spawnEntity(locations.get(i),types[i%types.length]));
+        }
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fMob-Schwarm!");
+    }
+
+    private void spawnMobs(Player player,int amount,EntityType type) {
+        int current=plugin.getIslandManager().countIslandEntities();
+        int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
+        for(Location location:plugin.getIslandManager().randomSurfaceLocations(Math.min(Math.max(0,amount),available))) {
+            track(player.getWorld().spawnEntity(location,type));
+        }
     }
 }
