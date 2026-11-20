@@ -2,7 +2,7 @@ package de.skychaos.events;
 
 import de.skychaos.SkyChaos;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -22,13 +22,13 @@ public final class ChaosEvents extends RandomEvent {
     @Override public void execute(Player player) { }
 
     private World fireWorld;
-    private Boolean previousFireTick;
+    private Integer previousFireSpreadRadius;
 
     @Override
     public void cleanup() {
-        if(fireWorld!=null && previousFireTick!=null) fireWorld.setGameRule(GameRule.DO_FIRE_TICK,previousFireTick);
+        if(fireWorld!=null && previousFireTick!=null) fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
         fireWorld=null;
-        previousFireTick=null;
+        previousFireSpreadRadius=null;
         super.cleanup();
     }
 
@@ -48,8 +48,8 @@ public final class ChaosEvents extends RandomEvent {
         }
         World world=player.getWorld();
         fireWorld=world;
-        previousFireTick=world.getGameRuleValue(GameRule.DO_FIRE_TICK);
-        world.setGameRule(GameRule.DO_FIRE_TICK,false);
+        previousFireSpreadRadius=world.getGameRuleValue(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER);
+        world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,0);
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
         schedule(()->{
             for(var flame:flames) if(flame.getType()==Material.FIRE) flame.setType(Material.AIR,false);
