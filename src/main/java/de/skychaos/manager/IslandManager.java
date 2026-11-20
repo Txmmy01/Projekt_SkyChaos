@@ -249,6 +249,7 @@ public final class IslandManager {
                 (float)plugin.getConfig().getDouble("island-spawn.yaw",0.0),
                 (float)plugin.getConfig().getDouble("island-spawn.pitch",0.0));
         if(contains(configured) && configured.getBlock().isPassable()
+                && configured.clone().add(0,1,0).getBlock().isPassable()
                 && configured.clone().subtract(0,1,0).getBlock().getType().isSolid()) return configured;
         Location surface=randomSurfaceLocation();
         if(surface!=null) return surface;
