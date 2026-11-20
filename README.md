@@ -29,7 +29,7 @@ All three dimensions are generated without normal terrain, caves, decorations or
 
 The starter island is immediately playable. The player can grow the oak tree, use the cobblestone generator, expand bridges, find random loot islands and explore the Nether and End.
 
-The Overworld Nether portal is built from obsidian but is not lit. The End portal frame is built without Eyes of Ender. Once activated, SkyChaos routes portal travel to its own void dimensions and their prepared arrival points.
+The Overworld Nether portal is built from obsidian but is not lit. The End portal frame is built without Eyes of Ender. Once activated, SkyChaos routes portal travel to its own void dimensions and their prepared arrival points. The Nether arrival island and the End island each also have a prepared return portal, so players can get back without searching for a vanilla portal.
 
 The Nether fortress is intentionally close to the Nether arrival island. It includes a compact fortress layout, blaze spawner and loot chests so players can reach Nether progression quickly.
 
