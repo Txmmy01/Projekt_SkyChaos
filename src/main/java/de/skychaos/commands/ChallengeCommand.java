@@ -10,7 +10,9 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.util.List;
 
-public final class ChallengeCommand implements CommandExecutor, TabCompleter {
+public final class ChallengeCommand implements CommandExecutor,TabCompleter {
+    private static final List<String> COMMANDS=List.of("build","pos1","pos2","save","start","reset",
+            "pause","resume","event","stats","stop","reload");
     private final SkyChaos plugin;
 
     public ChallengeCommand(SkyChaos plugin) {
@@ -18,19 +20,16 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender,Command command,String label,String[] args) {
         if(args.length==0) {
-            sender.sendMessage("§bSkyChaos §7- /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats>");
+            sender.sendMessage("§bSkyChaos §7- /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats|stop|reload>");
             return true;
         }
         String sub=args[0].toLowerCase();
-        if(sub.equals("build") || sub.equals("pos1") || sub.equals("pos2") || sub.equals("save")) {
-            if(!sender.hasPermission("skychaos.admin")) {
-                sender.sendMessage("§cDafür fehlt skychaos.admin.");
-                return true;
-            }
-        } else if(!sender.hasPermission("skychaos.play") && !sender.hasPermission("skychaos.admin")) {
-            sender.sendMessage("§cDafür fehlt skychaos.play.");
+        boolean admin=List.of("build","pos1","pos2","save","reload").contains(sub);
+        String permission=admin?"skychaos.admin":"skychaos.play";
+        if(!sender.hasPermission(permission) && !sender.hasPermission("skychaos.admin")) {
+            sender.sendMessage("§cDafür fehlt die Berechtigung "+permission+".");
             return true;
         }
         switch(sub) {
@@ -41,17 +40,26 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
             }
             case "pos1" -> {
                 if(!(sender instanceof Player player)) return playerOnly(sender);
+                if(!player.getWorld().equals(plugin.getIslandManager().getWorld())) {
+                    sender.sendMessage("§cDu musst dich in der SkyChaos-Void-Welt befinden.");
+                    return true;
+                }
                 plugin.getIslandManager().setPos1(player.getLocation());
                 sender.sendMessage("§aPosition 1 gesetzt.");
             }
             case "pos2" -> {
                 if(!(sender instanceof Player player)) return playerOnly(sender);
+                if(!player.getWorld().equals(plugin.getIslandManager().getWorld())) {
+                    sender.sendMessage("§cDu musst dich in der SkyChaos-Void-Welt befinden.");
+                    return true;
+                }
                 plugin.getIslandManager().setPos2(player.getLocation());
                 sender.sendMessage("§aPosition 2 gesetzt.");
             }
             case "save" -> {
                 try {
-                    if(plugin.getIslandManager().save()) sender.sendMessage("§aInsel gespeichert: plugins/SkyChaos/islands/starter-island.yml");
+                    if(plugin.getIslandManager().save())
+                        sender.sendMessage("§aInsel gespeichert: plugins/SkyChaos/islands/starter-island.yml");
                     else sender.sendMessage("§cSetze zuerst beide Positionen in der SkyChaos-Welt.");
                 } catch(IOException | IllegalArgumentException exception) {
                     sender.sendMessage("§cSpeichern fehlgeschlagen: "+exception.getMessage());
@@ -59,10 +67,6 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                 }
             }
             case "start" -> {
-                if(!plugin.getIslandManager().exists()) {
-                    sender.sendMessage("§cEs wurde noch keine Insel gespeichert. Nutze /challenge build und /challenge save.");
-                    return true;
-                }
                 try {
                     plugin.startChallenge(true);
                     sender.sendMessage("§aChallenge gestartet.");
@@ -72,10 +76,6 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                 }
             }
             case "reset" -> {
-                if(!plugin.getIslandManager().exists()) {
-                    sender.sendMessage("§cEs wurde noch keine Insel gespeichert.");
-                    return true;
-                }
                 try {
                     plugin.resetChallenge();
                     sender.sendMessage("§aChallenge zurückgesetzt.");
@@ -85,10 +85,18 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                 }
             }
             case "pause" -> {
+                if(!plugin.isActive() || plugin.isPaused()) {
+                    sender.sendMessage("§cDie Challenge ist nicht aktiv oder bereits pausiert.");
+                    return true;
+                }
                 plugin.pauseChallenge();
                 sender.sendMessage("§eChallenge pausiert.");
             }
             case "resume" -> {
+                if(!plugin.isActive() || !plugin.isPaused()) {
+                    sender.sendMessage("§cDie Challenge ist nicht pausiert.");
+                    return true;
+                }
                 plugin.resumeChallenge();
                 sender.sendMessage("§aChallenge fortgesetzt.");
             }
@@ -108,6 +116,18 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage("§7Events überlebt: §f"+plugin.getEventManager().getSurvivedEvents());
                 sender.sendMessage("§7Tode: §f"+plugin.getDeaths());
             }
+            case "stop" -> {
+                if(!plugin.isActive()) {
+                    sender.sendMessage("§cEs läuft keine Challenge.");
+                    return true;
+                }
+                plugin.stopChallenge();
+                sender.sendMessage("§cChallenge gestoppt.");
+            }
+            case "reload" -> {
+                plugin.reloadPluginConfigs();
+                sender.sendMessage("§aSkyChaos-Konfigurationen neu geladen.");
+            }
             default -> sender.sendMessage("§cUnbekannter Unterbefehl. Nutze /challenge.");
         }
         return true;
@@ -119,9 +139,12 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if(args.length==1) return List.of("build","pos1","pos2","save","start","reset","pause","resume","event","stats")
-                .stream().filter(value->value.startsWith(args[0].toLowerCase())).toList();
+    public List<String> onTabComplete(CommandSender sender,Command command,String alias,String[] args) {
+        if(args.length==1) return COMMANDS.stream()
+                .filter(value->value.startsWith(args[0].toLowerCase()))
+                .filter(value->sender.hasPermission(List.of("build","pos1","pos2","save","reload").contains(value)
+                        ?"skychaos.admin":"skychaos.play") || sender.hasPermission("skychaos.admin"))
+                .toList();
         return List.of();
     }
 }
