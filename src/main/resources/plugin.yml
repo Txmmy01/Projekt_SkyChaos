@@ -1,0 +1,17 @@
+name: SkyChaos
+version: 1.0.0
+main: de.skychaos.SkyChaos
+api-version: '26.3'
+authors: [Txmmy01]
+description: SkyBlock challenge with timed random events
+commands:
+  challenge:
+    description: Verwaltet die SkyChaos-Challenge
+    usage: /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats>
+permissions:
+  skychaos.admin:
+    description: Darf die Insel bearbeiten und speichern
+    default: op
+  skychaos.play:
+    description: Darf die Challenge verwalten
+    default: op
