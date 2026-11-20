@@ -63,7 +63,7 @@ Event categories are weighted as GOOD 40, NEUTRAL 30 and BAD 30 by default. BAD 
 
 ## CI
 
-The workflow at `.github/workflows/build.yml` runs Maven verification on Java 25 for pushes and pull requests.
+The workflow at `.github/workflows/build.yml` runs Maven verification on Java 25 for pushes and pull requests. `.github/workflows/java25-validation.yml` provides a dedicated Java 25 pull-request validation.
 
 
 ## Event catalogue
