@@ -200,7 +200,7 @@ public final class IslandManager {
         long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
         if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks
                 || (long)sx*sy*sz>maxBlocks || oy<world.getMinHeight()
-                || (long)oy+sy>world.getMaxHeight() || (long)ox+sx-1>Integer.MAX_VALUE
+                || (long)oy+sy>world.getMaxHeight() || (long)ox+sx-1>=Integer.MAX_VALUE
                 || (long)oz+sz-1>=Integer.MAX_VALUE || !world.getName().equals(yaml.getString("world",world.getName()))) return;
         minX=ox; minY=oy; minZ=oz;
         maxX=ox+sx-1; maxY=oy+sy-1; maxZ=oz+sz-1;
