@@ -1,0 +1,35 @@
+name: Java 25 Paper 26.3 Validation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Java 25 / Paper 26.3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v4
+      - name: Set up Temurin Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Verify toolchain
+        run: |
+          java -version
+          mvn -version
+      - name: Build and verify
+        run: mvn --batch-mode --no-transfer-progress clean verify
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SkyChaos-java25
+          path: target/SkyChaos.jar
+          if-no-files-found: error
