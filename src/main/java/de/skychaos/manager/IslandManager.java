@@ -158,16 +158,18 @@ public final class IslandManager {
     }
 
     public Location randomSurfaceLocation() {
-        if (maxX < minX) loadBounds();
-        for (int attempt=0; attempt<40; attempt++) {
-            int x=minX+(int)(Math.random()*(maxX-minX+1));
-            int z=minZ+(int)(Math.random()*(maxZ-minZ+1));
-            for (int y=maxY+1; y>=minY; y--) {
-                Block block=world.getBlockAt(x,y,z);
-                if (!block.getType().isAir() && block.getType().isSolid()) return block.getLocation().add(0.5,1,0.5);
-            }
+        if(maxX<minX) loadBounds();
+        List<Block> surfaces=new ArrayList<>();
+        for(Block block:getIslandBlocks()) {
+            if(block.getType().isSolid() && block.getRelative(0,1,0).getType().isAir()) surfaces.add(block);
         }
-        return getSpawnLocation();
+        if(surfaces.isEmpty()) return null;
+        Block selected=surfaces.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(surfaces.size()));
+        return selected.getLocation().add(0.5,1.0,0.5);
+    }
+
+    public boolean hasSurface() {
+        return randomSurfaceLocation()!=null;
     }
 
     public Location getSpawnLocation() {
