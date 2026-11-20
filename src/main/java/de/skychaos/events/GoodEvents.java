@@ -22,9 +22,9 @@ public final class GoodEvents extends RandomEvent {
     @Override public void execute(Player player) { }
 
     public void lootRain(Player player) {
-        if (!enabled()) return;
+        if (!enabled("loot-rain")) return;
         List<Material> pool = List.of(Material.BREAD, Material.OAK_LOG, Material.COBBLESTONE, Material.IRON_INGOT, Material.ARROW, Material.BONE, Material.COAL);
-        for (int i=0;i<value("amount",10);i++) {
+        for (int i=0;i<value("loot-rain","amount",10);i++) {
             Location location=plugin.getIslandManager().randomSurfaceLocation().add(0,8,0);
             Material material=pool.get(ThreadLocalRandom.current().nextInt(pool.size()));
             player.getWorld().dropItem(location,new ItemStack(material));
@@ -33,30 +33,30 @@ public final class GoodEvents extends RandomEvent {
     }
 
     public void diamondRain(Player player) {
-        if (!enabled()) return;
-        int amount=ThreadLocalRandom.current().nextInt(value("min",3),value("max",5)+1);
+        if (!enabled("diamond-rain")) return;
+        int amount=ThreadLocalRandom.current().nextInt(value("diamond-rain","min",3),value("diamond-rain","max",5)+1);
         for (int i=0;i<amount;i++) player.getWorld().dropItem(plugin.getIslandManager().randomSurfaceLocation().add(0,5,0),new ItemStack(Material.DIAMOND));
         announce("Diamantenregen");
     }
 
     public void xpBoost(Player player) {
-        if (!enabled()) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, value("duration",60)*20, 0, false, true));
+        if (!enabled("xp-boost")) return;
+        plugin.startXpBoost(value("xp-boost","duration",60));
         announce("XP-Boost");
     }
 
     public void traderVisit(Player player) {
-        if (!enabled()) return;
+        if (!enabled("trader-visit")) return;
         Location location=plugin.getIslandManager().randomSurfaceLocation();
         Villager villager=(Villager)player.getWorld().spawnEntity(location, EntityType.VILLAGER);
         villager.setCustomName("§bSkyChaos-Händler");
         villager.setCustomNameVisible(true);
-        Bukkit.getScheduler().runTaskLater(plugin,villager::remove,value("duration",60)*20L);
+        Bukkit.getScheduler().runTaskLater(plugin,villager::remove,value("trader-visit","duration",60)*20L);
         announce("Händlerbesuch");
     }
 
     public void fullHeal(Player player) {
-        if (!enabled()) return;
+        if (!enabled("full-heal")) return;
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
         player.setSaturation(20);
