@@ -1,7 +1,6 @@
 package de.skychaos.events;
 
 import de.skychaos.SkyChaos;
-import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,7 +58,7 @@ public final class ChaosEvents extends RandomEvent {
         fireWorld=world;
         previousFireSpreadRadius=world.getGameRuleValue(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER);
         world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,0);
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fFeuersturm!");
         schedule(()->{
             for(var flame:flames) restoreTemporaryBlock(flame);
             restoreFireRule();
@@ -69,19 +68,19 @@ public final class ChaosEvents extends RandomEvent {
     public void endermanInvasion(Player player) {
         if(!enabled("enderman-invasion")) return;
         spawnMobs(player,value("enderman-invasion","amount",5),EntityType.ENDERMAN);
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fEnderman-Invasion!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fEnderman-Invasion!");
     }
 
     public void noBuild(Player player) {
         if(!enabled("no-build")) return;
         plugin.setNoBuildUntil(System.currentTimeMillis()+value("no-build","duration",20)*1000L);
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fBauen ist vorübergehend deaktiviert!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fBauen ist vorübergehend deaktiviert!");
     }
 
     public void wither(Player player) {
         if(!enabled("wither")) return;
         plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.WITHER,value("wither","duration",8)*20,0,false,false,true));
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fWither-Fluch!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fWither-Fluch!");
     }
 
     public void mobSwarm(Player player) {
@@ -95,7 +94,7 @@ public final class ChaosEvents extends RandomEvent {
         for(int i=0;i<locations.size();i++) {
             track(player.getWorld().spawnEntity(locations.get(i),types[i%types.length]));
         }
-        Bukkit.broadcastMessage("§5§lCHAOS §8» §fMob-Schwarm!");
+        SkyChaos.broadcastLegacy("§5§lCHAOS §8» §fMob-Schwarm!");
     }
 
     private void spawnMobs(Player player,int amount,EntityType type) {
