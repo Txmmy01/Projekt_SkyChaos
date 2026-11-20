@@ -47,7 +47,7 @@ public final class TimerManager {
         if(remaining>0) remaining--;
         if(remaining<=5 && remaining>0) {
             for(Player player:Bukkit.getOnlinePlayers()) {
-                if(player.getWorld().equals(plugin.getIslandManager().getWorld())) {
+                if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) {
                     player.showTitle(Title.title(Component.text("In "+remaining+"s passiert was..."),
                             Component.empty(),Title.Times.times(Duration.ZERO,Duration.ofSeconds(1),Duration.ofMillis(200))));
                 }
@@ -67,7 +67,7 @@ public final class TimerManager {
         bossBar.setColor(remaining<=10?BarColor.RED:BarColor.BLUE);
         bossBar.setTitle(String.format("Nächstes Event in: %02d:%02d",remaining/60,remaining%60));
         for(Player player:Bukkit.getOnlinePlayers()) {
-            if(player.getWorld().equals(plugin.getIslandManager().getWorld())) {
+            if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) {
                 if(!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
             } else if(bossBar.getPlayers().contains(player)) {
                 bossBar.removePlayer(player);
@@ -76,7 +76,7 @@ public final class TimerManager {
     }
 
     public void addPlayer(Player player) {
-        if(task!=null && !task.isCancelled() && player.getWorld().equals(plugin.getIslandManager().getWorld())) bossBar.addPlayer(player);
+        if(task!=null && !task.isCancelled() && plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) bossBar.addPlayer(player);
         updateBar();
     }
 
