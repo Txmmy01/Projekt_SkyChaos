@@ -1,6 +1,6 @@
 # SkyChaos 2.0.0
 
-SkyChaos is a configurable SkyBlock challenge plugin for Paper 26.3 (API build 257-stable), built with Java 25 and Maven. The API dependency is pinned to Paper 26.3 build 257-stable. It has no runtime dependencies beyond the Paper API.
+SkyChaos is a configurable SkyBlock challenge plugin for Paper 26.3 (API build 255-stable), built with Java 25 and Maven. The API dependency is pinned to Paper 26.3 build 255-stable. It has no runtime dependencies beyond the Paper API.
 
 ## Requirements
 
@@ -64,3 +64,11 @@ Event categories are weighted as GOOD 40, NEUTRAL 30 and BAD 30 by default. BAD 
 ## CI
 
 The workflow at `.github/workflows/build.yml` runs Maven verification on Java 25 for pushes and pull requests.
+
+
+## Event catalogue
+
+- **GOOD:** LootRain, DiamondRain, XPBoost, TraderVisit, FullHeal, Regeneration, Absorption, Saturation
+- **NEUTRAL:** BlockSwap, GravityFlip, MobParty, InventoryShuffle, GiantSlime, LowGravity
+- **BAD:** BlockDisappear, MobAttack, CreeperRain, LavaTrap, InventorySteal, Blindness, IslandQuake, Hunger, Poison, CobwebTrap, LightningWarning
+- **CHAOS:** FireStorm, EndermanInvasion, NoBuild, Wither, MobSwarm and the weighted DoubleEvent roll
