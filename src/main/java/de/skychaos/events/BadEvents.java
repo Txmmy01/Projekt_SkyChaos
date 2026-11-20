@@ -36,7 +36,13 @@ public final class BadEvents extends RandomEvent {
         EntityType[] types={EntityType.ZOMBIE,EntityType.SKELETON,EntityType.SPIDER};
         int amount=ThreadLocalRandom.current().nextInt(value("mob-attack","min",3),value("mob-attack","max",5)+1);
         for(int i=0;i<amount;i++) {
-            Location location=plugin.getIslandManager().randomSurfaceLocation();
+            Location nearby=player.getLocation().clone().add(ThreadLocalRandom.current().nextInt(-3,4),0,
+                    ThreadLocalRandom.current().nextInt(-3,4));
+            Location location=nearby;
+            if(!plugin.getIslandManager().contains(nearby)
+                    || !nearby.clone().subtract(0,1,0).getBlock().getType().isSolid()) {
+                location=plugin.getIslandManager().randomSurfaceLocation();
+            }
             player.getWorld().spawnEntity(location,types[ThreadLocalRandom.current().nextInt(types.length)]);
         }
         announce("Mob-Angriff");
