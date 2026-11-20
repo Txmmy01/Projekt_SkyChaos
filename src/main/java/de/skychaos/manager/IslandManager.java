@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -218,15 +219,24 @@ public final class IslandManager {
         return result;
     }
 
-    public Location randomSurfaceLocation() {
+    public List<Location> randomSurfaceLocations(int amount) {
+        if(amount<=0) return List.of();
         List<Block> surfaces=new ArrayList<>();
         for(Block block:getIslandBlocks()) {
             if(block.getType().isSolid() && block.getRelative(0,1,0).getType().isAir()
                     && block.getRelative(0,2,0).getType().isAir() && block.getY()+2<world.getMaxHeight()) surfaces.add(block);
         }
-        if(surfaces.isEmpty()) return null;
-        Block selected=surfaces.get(ThreadLocalRandom.current().nextInt(surfaces.size()));
-        return selected.getLocation().add(0.5,1.0,0.5);
+        if(surfaces.isEmpty()) return List.of();
+        Collections.shuffle(surfaces);
+        List<Location> locations=new ArrayList<>(Math.min(amount,surfaces.size()));
+        for(int i=0;i<Math.min(amount,surfaces.size());i++)
+            locations.add(surfaces.get(i).getLocation().add(0.5,1.0,0.5));
+        return locations;
+    }
+
+    public Location randomSurfaceLocation() {
+        List<Location> locations=randomSurfaceLocations(1);
+        return locations.isEmpty()?null:locations.getFirst();
     }
 
     public boolean hasSurface() {
