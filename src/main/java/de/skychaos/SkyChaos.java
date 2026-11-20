@@ -95,7 +95,16 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         clearTemporaryEffects();
     }
 
-    private void loadEventsConfig() {\n        eventsConfig=YamlConfiguration.loadConfiguration(new File(getDataFolder(),"events.yml"));\n        try(java.io.InputStreamReader reader=new java.io.InputStreamReader(getResource("events.yml"),java.nio.charset.StandardCharsets.UTF_8)) {\n            eventsConfig.setDefaults(YamlConfiguration.loadConfiguration(reader));\n        } catch(java.io.IOException exception) {\n            getLogger().severe("events.yml-Standardwerte konnten nicht geladen werden: "+exception.getMessage());\n        }\n    }\n\n    private void saveResourceIfMissing(String name) {
+    private void loadEventsConfig() {
+        eventsConfig=YamlConfiguration.loadConfiguration(new File(getDataFolder(),"events.yml"));
+        try(java.io.InputStreamReader reader=new java.io.InputStreamReader(getResource("events.yml"),java.nio.charset.StandardCharsets.UTF_8)) {
+            eventsConfig.setDefaults(YamlConfiguration.loadConfiguration(reader));
+        } catch(java.io.IOException exception) {
+            getLogger().severe("events.yml-Standardwerte konnten nicht geladen werden: "+exception.getMessage());
+        }
+    }
+
+    private void saveResourceIfMissing(String name) {
         File file=new File(getDataFolder(),name);
         if(!file.exists()) saveResource(name,false);
     }
@@ -151,12 +160,18 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onBlockExplode(BlockExplodeEvent event) {
-        if(active && islandManager.contains(event.getBlock().getLocation())) {\n            event.blockList().clear();\n            event.setYield(0.0f);\n        }
+        if(active && islandManager.contains(event.getBlock().getLocation())) {
+            event.blockList().clear();
+            event.setYield(0.0f);
+        }
     }
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        if(active && islandManager.contains(event.getLocation())) {\n            event.blockList().clear();\n            event.setYield(0.0f);\n        }
+        if(active && islandManager.contains(event.getLocation())) {
+            event.blockList().clear();
+            event.setYield(0.0f);
+        }
     }
 
     @EventHandler
@@ -297,7 +312,12 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         }
     }
 
-    public void reloadPluginConfigs() {\n        reloadConfig();\n        loadEventsConfig();\n    }\n\n    public void resetChallenge() {
+    public void reloadPluginConfigs() {
+        reloadConfig();
+        loadEventsConfig();
+    }
+
+    public void resetChallenge() {
         startChallenge(false);
     }
 
