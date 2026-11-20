@@ -129,7 +129,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             Bukkit.getScheduler().runTask(this,()->{
                 if(!player.isOnline()) return;
                 player.setGameMode(lives.getOrDefault(player.getUniqueId(),0)<=0?GameMode.SPECTATOR:GameMode.SURVIVAL);
-                player.teleport(islandManager.getSpawnLocation());
+                player.teleport(resolveChallengeSpawn(player));
                 timerManager.addPlayer(player);
             });
         } else {
@@ -208,10 +208,10 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(!active || paused || event.getTo()==null
+        if(!active || paused || event.getTo()==null || event.getTo().getWorld()==null
                 || !event.getTo().getWorld().equals(islandManager.getWorld())) return;
         if(event.getTo().getY()<islandManager.getWorld().getMinHeight()+2) {
-            event.getPlayer().teleport(islandManager.getSpawnLocation());
+            event.getPlayer().teleport(resolveChallengeSpawn(event.getPlayer()));
             return;
         }
         if(event.getTo().getBlockX()!=event.getFrom().getBlockX()
@@ -235,7 +235,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public void onRespawn(PlayerRespawnEvent event) {
         if(!active) return;
         Player player=event.getPlayer();
-        event.setRespawnLocation(islandManager.getSpawnLocation());
+        event.setRespawnLocation(resolveChallengeSpawn(player));
         Bukkit.getScheduler().runTask(this,()->{
             if(!player.isOnline() || !active) return;
             if(lives.getOrDefault(player.getUniqueId(),0)<=0) player.setGameMode(GameMode.SPECTATOR);
@@ -257,6 +257,16 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public void onExpChange(PlayerExpChangeEvent event) {
         if(active && !paused && System.currentTimeMillis()<xpBoostUntil)
             event.setAmount(event.getAmount()*xpBoostMultiplier);
+    }
+
+    private org.bukkit.Location resolveChallengeSpawn(Player player) {
+        try {
+            return islandManager.getSpawnLocation();
+        } catch(IllegalStateException exception) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.sendMessage("§eDie Insel hat keinen sicheren Spawn mehr. Du wurdest in den Spectator-Modus versetzt.");
+            return islandManager.getWorld().getSpawnLocation();
+        }
     }
 
     public void prepareIdlePlayer(Player player) {
