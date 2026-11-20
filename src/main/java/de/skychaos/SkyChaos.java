@@ -128,7 +128,10 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             lives.putIfAbsent(player.getUniqueId(),Math.max(1,getConfig().getInt("lives",3)));
             Bukkit.getScheduler().runTask(this,()->{
                 if(!player.isOnline()) return;
-                player.setGameMode(lives.getOrDefault(player.getUniqueId(),0)<=0?GameMode.SPECTATOR:GameMode.SURVIVAL);
+                boolean spectator=lives.getOrDefault(player.getUniqueId(),0)<=0;
+                player.setGameMode(spectator?GameMode.SPECTATOR:GameMode.SURVIVAL);
+                player.setAllowFlight(spectator);
+                if(!spectator) player.setFlying(false);
                 player.teleport(resolveChallengeSpawn(player));
                 timerManager.addPlayer(player);
             });
@@ -247,8 +250,14 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         boolean hasSafeSpawn=safeSpawn;
         Bukkit.getScheduler().runTask(this,()->{
             if(!player.isOnline() || !active) return;
-            if(lives.getOrDefault(player.getUniqueId(),0)<=0 || !hasSafeSpawn) player.setGameMode(GameMode.SPECTATOR);
-            else player.setGameMode(GameMode.SURVIVAL);
+            if(lives.getOrDefault(player.getUniqueId(),0)<=0 || !hasSafeSpawn) {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.setAllowFlight(true);
+            } else {
+                player.setGameMode(GameMode.SURVIVAL);
+                player.setAllowFlight(false);
+                player.setFlying(false);
+            }
         });
     }
 
