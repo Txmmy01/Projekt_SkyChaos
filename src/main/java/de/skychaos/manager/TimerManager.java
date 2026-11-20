@@ -31,14 +31,14 @@ public final class TimerManager {
         elapsedSeconds=0L;
         remaining=eventInterval();
         paused=false;
-        for(Player player:Bukkit.getOnlinePlayers()) if(player.getWorld().equals(plugin.getIslandManager().getWorld())) bossBar.addPlayer(player);
+        for(Player player:Bukkit.getOnlinePlayers()) if(plugin.getWorldSetupManager().isChallengeWorld(player.getWorld())) bossBar.addPlayer(player);
         bossBar.setVisible(true);
         updateBar();
         task=Bukkit.getScheduler().runTaskTimer(plugin,this::tick,20L,20L);
     }
 
     private int eventInterval() {
-        return Math.max(10,Math.min(3600,plugin.getConfig().getInt("timer-seconds",120)));
+        return plugin.getEventIntervalSeconds();
     }
 
     private void tick() {
