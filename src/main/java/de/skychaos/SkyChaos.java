@@ -35,6 +35,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -47,6 +49,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private EventManager eventManager;
     private YamlConfiguration eventsConfig;
     private final Map<UUID,Integer> lives=new HashMap<>();
+    private final Map<UUID,Map<PotionEffectType,EffectSnapshot>> effectSnapshots=new HashMap<>();
     private boolean active;
     private boolean paused;
     private boolean buildMode;
@@ -54,6 +57,8 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private long noBuildUntil;
     private long xpBoostUntil;
     private int xpBoostMultiplier=2;
+
+    private record EffectSnapshot(PotionEffect previous,long capturedAt,int appliedAmplifier,long expiresAt) { }
     private Boolean previousMobGriefing;
     private Boolean previousMobSpawning;
 
@@ -135,6 +140,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         if(timerManager!=null) timerManager.removePlayer(event.getPlayer());
+        clearTemporaryEffects(event.getPlayer());
     }
 
     @EventHandler
@@ -336,18 +342,44 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         previousMobSpawning=null;
     }
 
+    public void applyChallengeEffect(Player player,PotionEffect effect) {
+        long now=System.currentTimeMillis();
+        Map<PotionEffectType,EffectSnapshot> snapshots=effectSnapshots.computeIfAbsent(player.getUniqueId(),key->new HashMap<>());
+        EffectSnapshot old=snapshots.get(effect.getType());
+        if(!snapshots.containsKey(effect.getType())) {
+            old=new EffectSnapshot(player.getPotionEffect(effect.getType()),now,effect.getAmplifier(),now+effect.getDuration()*50L);
+        } else {
+            old=new EffectSnapshot(old.previous(),old.capturedAt(),effect.getAmplifier(),now+effect.getDuration()*50L);
+        }
+        snapshots.put(effect.getType(),old);
+        player.addPotionEffect(effect,true);
+    }
+
     private void clearTemporaryEffects() {
-        for(Player player:Bukkit.getOnlinePlayers()) {
-            for(var type:new org.bukkit.potion.PotionEffectType[]{
-                    org.bukkit.potion.PotionEffectType.JUMP_BOOST,
-                    org.bukkit.potion.PotionEffectType.SLOW_FALLING,
-                    org.bukkit.potion.PotionEffectType.BLINDNESS,
-                    org.bukkit.potion.PotionEffectType.SLOWNESS,
-                    org.bukkit.potion.PotionEffectType.HUNGER,
-                    org.bukkit.potion.PotionEffectType.POISON,
-                    org.bukkit.potion.PotionEffectType.WITHER,
-                    org.bukkit.potion.PotionEffectType.REGENERATION,
-                    org.bukkit.potion.PotionEffectType.ABSORPTION}) player.removePotionEffect(type);
+        for(Player player:Bukkit.getOnlinePlayers()) clearTemporaryEffects(player);
+        effectSnapshots.clear();
+    }
+
+    private void clearTemporaryEffects(Player player) {
+        Map<PotionEffectType,EffectSnapshot> snapshots=effectSnapshots.remove(player.getUniqueId());
+        if(snapshots==null) return;
+        long now=System.currentTimeMillis();
+        for(Map.Entry<PotionEffectType,EffectSnapshot> entry:snapshots.entrySet()) {
+            PotionEffectType type=entry.getKey();
+            EffectSnapshot snapshot=entry.getValue();
+            PotionEffect current=player.getPotionEffect(type);
+            boolean challengeEffect=current!=null && current.getAmplifier()==snapshot.appliedAmplifier()
+                    && now<=snapshot.expiresAt()+1000L;
+            if(challengeEffect) player.removePotionEffect(type);
+            PotionEffect previous=snapshot.previous();
+            if(previous!=null && (challengeEffect || current==null)) {
+                int elapsed=(int)Math.max(0L,(now-snapshot.capturedAt())/50L);
+                int remaining=previous.getDuration()-elapsed;
+                if(remaining>0) {
+                    player.addPotionEffect(new PotionEffect(type,remaining,previous.getAmplifier(),
+                            previous.isAmbient(),previous.hasParticles(),previous.hasIcon()),true);
+                }
+            }
         }
     }
 
