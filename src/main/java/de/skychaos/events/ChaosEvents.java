@@ -18,15 +18,20 @@ public final class ChaosEvents extends RandomEvent {
 
     public void fireStorm(Player player) {
         if (!enabled("fire-storm")) return;
-        for (var block : plugin.getIslandManager().getIslandBlocks()) {
-            if (block.getType().name().endsWith("_LOG") || block.getType().name().endsWith("_WOOD")
-                    || block.getType().name().endsWith("_PLANKS")) {
-                block.setType(Material.FIRE,false);
+        java.util.List<org.bukkit.block.Block> flames=new java.util.ArrayList<>();
+        for(var block:plugin.getIslandManager().getIslandBlocks()) {
+            String type=block.getType().name();
+            if(type.endsWith("_LOG") || type.endsWith("_WOOD") || type.endsWith("_PLANKS")) {
+                org.bukkit.block.Block above=block.getRelative(0,1,0);
+                if(above.getType().isAir() && plugin.getIslandManager().contains(above.getLocation())) {
+                    above.setType(Material.FIRE,false);
+                    flames.add(above);
+                }
             }
         }
         Bukkit.broadcastMessage("§5§lCHAOS §8» §fFeuersturm!");
         Bukkit.getScheduler().runTaskLater(plugin,()->{
-            for(var block:plugin.getIslandManager().getIslandBlocks()) if(block.getType()==Material.FIRE) block.setType(Material.AIR,false);
+            for(var flame:flames) if(flame.getType()==Material.FIRE) flame.setType(Material.AIR,false);
         },value("fire-storm","duration",10)*20L);
     }
 
