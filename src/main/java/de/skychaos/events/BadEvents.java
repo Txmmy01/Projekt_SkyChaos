@@ -116,8 +116,8 @@ public final class BadEvents extends RandomEvent {
     public void blindness(Player player) {
         if(!enabled("blindness")) return;
         int duration=value("blindness","duration",15)*20;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,duration,0,false,false,true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,duration,0,false,false,true));
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.BLINDNESS,duration,0,false,false,true));
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.SLOWNESS,duration,0,false,false,true));
         announce("Dunkelheit");
     }
 
@@ -144,14 +144,14 @@ public final class BadEvents extends RandomEvent {
 
     public void hunger(Player player) {
         if(!enabled("hunger")) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER,value("hunger","duration",12)*20,
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.HUNGER,value("hunger","duration",12)*20,
                 Math.max(0,value("hunger","amplifier",1)),false,false,true));
         announce("Hunger");
     }
 
     public void poison(Player player) {
         if(!enabled("poison")) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.POISON,value("poison","duration",8)*20,
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.POISON,value("poison","duration",8)*20,
                 Math.max(0,value("poison","amplifier",0)),false,false,true));
         announce("Vergiftung");
     }
