@@ -71,13 +71,8 @@ public abstract class RandomEvent {
             if(entity!=null && entity.isValid()) entity.remove();
         }
         spawnedEntities.clear();
-        for(Map.Entry<Block,BlockData> entry:temporaryBlocks.entrySet()) {
-            Block block=entry.getKey();
-            if(block.getType().isAir() || block.getBlockData().getMaterial()==org.bukkit.Material.COBWEB
-                    || block.getType()==org.bukkit.Material.LAVA || block.getType()==org.bukkit.Material.FIRE) {
-                block.setBlockData(entry.getValue(),false);
-            }
-        }
+        for(Map.Entry<Block,BlockData> entry:temporaryBlocks.entrySet())
+            entry.getKey().setBlockData(entry.getValue(),false);
         temporaryBlocks.clear();
     }
 }
