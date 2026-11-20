@@ -7,7 +7,7 @@ import de.skychaos.manager.TimerManager;
 import de.skychaos.world.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -320,8 +320,8 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     private void applyWorldRules() {
         World world=islandManager.getWorld();
-        if(previousMobGriefing==null) previousMobGriefing=world.getGameRuleValue(GameRule.MOB_GRIEFING);
-        if(previousMobSpawning==null) previousMobSpawning=world.getGameRuleValue(GameRule.DO_MOB_SPAWNING);
+        if(previousMobGriefing==null) previousMobGriefing=world.getGameRuleValue(GameRules.MOB_GRIEFING);
+        if(previousMobSpawning==null) previousMobSpawning=world.getGameRuleValue(GameRules.SPAWN_MOBS);
         world.setGameRule(GameRule.MOB_GRIEFING,false);
         world.setGameRule(GameRule.DO_MOB_SPAWNING,false);
     }
