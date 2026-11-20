@@ -214,7 +214,8 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
-        if(active && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+        if(active && event.getBlock().getWorld().equals(islandManager.getWorld())
+                && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
@@ -247,13 +248,18 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onFallingBlockChange(EntityChangeBlockEvent event) {
-        if(active && event.getEntity() instanceof org.bukkit.entity.FallingBlock
+        if(active && event.getBlock().getWorld().equals(islandManager.getWorld())
+                && event.getEntity() instanceof org.bukkit.entity.FallingBlock
                 && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
-        if(!active || !worldSetupManager.isChallengeWorld(event.getFrom().getWorld())) return;
+        if(!worldSetupManager.isChallengeWorld(event.getFrom().getWorld())) return;
+        if(!active) {
+            event.setCancelled(true);
+            return;
+        }
         World from=event.getFrom().getWorld();
         World destination=null;
         if(from.equals(worldSetupManager.getOverworld())) {
