@@ -1,6 +1,6 @@
 # SkyChaos 2.0.0
 
-SkyChaos is a configurable SkyBlock challenge plugin for Paper 26.3, built with Java 25 and Maven. It has no runtime dependencies beyond the Paper API.
+SkyChaos is a configurable SkyBlock challenge plugin for Paper 26.3 (API build 257-stable), built with Java 25 and Maven. The API dependency is pinned to Paper 26.3 build 257-stable. It has no runtime dependencies beyond the Paper API.
 
 ## Requirements
 
