@@ -31,7 +31,7 @@ public final class TimerManager {
         elapsedSeconds=0L;
         remaining=eventInterval();
         paused=false;
-        for(Player player:Bukkit.getOnlinePlayers()) bossBar.addPlayer(player);
+        for(Player player:Bukkit.getOnlinePlayers()) if(player.getWorld().equals(plugin.getIslandManager().getWorld())) bossBar.addPlayer(player);
         bossBar.setVisible(true);
         updateBar();
         task=Bukkit.getScheduler().runTaskTimer(plugin,this::tick,20L,20L);
@@ -67,13 +67,16 @@ public final class TimerManager {
         bossBar.setColor(remaining<=10?BarColor.RED:BarColor.BLUE);
         bossBar.setTitle(String.format("Nächstes Event in: %02d:%02d",remaining/60,remaining%60));
         for(Player player:Bukkit.getOnlinePlayers()) {
-            if(player.getWorld().equals(plugin.getIslandManager().getWorld()) && !bossBar.getPlayers().contains(player))
-                bossBar.addPlayer(player);
+            if(player.getWorld().equals(plugin.getIslandManager().getWorld())) {
+                if(!bossBar.getPlayers().contains(player)) bossBar.addPlayer(player);
+            } else if(bossBar.getPlayers().contains(player)) {
+                bossBar.removePlayer(player);
+            }
         }
     }
 
     public void addPlayer(Player player) {
-        if(task!=null && !task.isCancelled()) bossBar.addPlayer(player);
+        if(task!=null && !task.isCancelled() && player.getWorld().equals(plugin.getIslandManager().getWorld())) bossBar.addPlayer(player);
         updateBar();
     }
 
