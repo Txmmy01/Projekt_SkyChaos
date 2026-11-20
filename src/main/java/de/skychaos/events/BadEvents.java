@@ -54,10 +54,12 @@ public final class BadEvents extends RandomEvent {
     public void lavaTrap(Player player) {
         if (!enabled("lava-trap")) return;
         Block block=player.getLocation().subtract(0,1,0).getBlock();
-        if (!plugin.getIslandManager().contains(block.getLocation()) || !block.getType().isAir()) return;
-        Material previous=block.getType();
+        if(!plugin.getIslandManager().contains(block.getLocation()) || !block.getType().isSolid()) return;
+        org.bukkit.block.data.BlockData previous=block.getBlockData().clone();
         block.setType(Material.LAVA,false);
-        Bukkit.getScheduler().runTaskLater(plugin,()->block.setType(previous,false),value("lava-trap","duration",5)*20L);
+        Bukkit.getScheduler().runTaskLater(plugin,()->{
+            if(block.getType()==Material.LAVA) block.setBlockData(previous,false);
+        },value("lava-trap","duration",5)*20L);
         announce("Lavafalle");
     }
 
