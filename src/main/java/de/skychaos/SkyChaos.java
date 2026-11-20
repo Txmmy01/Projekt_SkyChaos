@@ -120,7 +120,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         Player player=event.getPlayer();
         if(active) {
             timerManager.addPlayer(player);
-            lives.putIfAbsent(player.getUniqueId(),getConfig().getInt("lives",3));
+            lives.putIfAbsent(player.getUniqueId(),Math.max(1,getConfig().getInt("lives",3)));
             Bukkit.getScheduler().runTask(this,()->{
                 if(!player.isOnline()) return;
                 player.setGameMode(lives.getOrDefault(player.getUniqueId(),0)<=0?GameMode.SPECTATOR:GameMode.SURVIVAL);
@@ -268,6 +268,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             if(!(entity instanceof Player) && islandManager.contains(entity.getLocation())) entity.remove();
         }
         islandManager.restore();
+        org.bukkit.Location challengeSpawn=islandManager.getSpawnLocation();
         active=true;
         paused=false;
         applyWorldRules();
@@ -288,7 +289,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             player.setHealth(player.getMaxHealth());
             player.setFoodLevel(20);
             player.setSaturation(20);
-            player.teleport(islandManager.getSpawnLocation());
+            player.teleport(challengeSpawn);
             giveStarterKit(player);
         }
         timerManager.start();
