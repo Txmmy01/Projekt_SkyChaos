@@ -92,10 +92,7 @@ public final class BadEvents extends RandomEvent {
         if(!plugin.getIslandManager().contains(block.getLocation()) || !block.getType().isSolid()) return;
         trackTemporaryBlock(block);
         block.setType(Material.LAVA,false);
-        schedule(()->{
-            if(block.getType()==Material.LAVA) block.setType(Material.AIR,false);
-            cleanup();
-        },value("lava-trap","duration",5)*20L);
+        schedule(()->restoreTemporaryBlock(block),value("lava-trap","duration",5)*20L);
         announce("Lavafalle");
     }
 
@@ -165,10 +162,7 @@ public final class BadEvents extends RandomEvent {
         if(!plugin.getIslandManager().contains(block.getLocation()) || !block.getType().isAir()) return;
         trackTemporaryBlock(block);
         block.setType(Material.COBWEB,false);
-        schedule(()->{
-            if(block.getType()==Material.COBWEB) block.setType(Material.AIR,false);
-            cleanup();
-        },value("cobweb-trap","duration",8)*20L);
+        schedule(()->restoreTemporaryBlock(block),value("cobweb-trap","duration",8)*20L);
         announce("Spinnennetz-Falle");
     }
 
