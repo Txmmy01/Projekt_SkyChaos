@@ -23,9 +23,11 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -154,6 +156,12 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onBlockSpread(BlockSpreadEvent event) {
+        if(active && islandManager.contains(event.getSource().getLocation())
+                && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
         if(active && !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
@@ -177,6 +185,13 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             event.blockList().clear();
             event.setYield(0.0f);
         }
+    }
+
+    @EventHandler
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        if(active && event.getEntity() instanceof org.bukkit.entity.Enderman
+                && islandManager.contains(event.getFrom()) && event.getTo()!=null
+                && !islandManager.contains(event.getTo())) event.setCancelled(true);
     }
 
     @EventHandler
@@ -264,7 +279,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         lives.clear();
         clearTemporaryEffects();
         for(Player player:Bukkit.getOnlinePlayers()) {
-            lives.put(player.getUniqueId(),getConfig().getInt("lives",3));
+            lives.put(player.getUniqueId(),Math.max(1,getConfig().getInt("lives",3)));
             player.getInventory().clear();
             player.setGameMode(GameMode.SURVIVAL);
             player.setAllowFlight(false);
