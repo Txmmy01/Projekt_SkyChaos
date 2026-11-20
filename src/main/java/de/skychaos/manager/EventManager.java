@@ -11,6 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,7 +150,7 @@ public final class EventManager {
         int changed=0;
         for(var block:blocks) {
             if(changed>=amount) break;
-            if(block.getType().isSolid() && !block.getType().isInteractable() && !(block.getState() instanceof org.bukkit.block.TileState)) {
+            if(safeMaterials.contains(block.getType())) {
                 block.setType(safeMaterials.get(ThreadLocalRandom.current().nextInt(safeMaterials.size())),false);
                 changed++;
             }
@@ -183,14 +184,15 @@ public final class EventManager {
         if(locations.isEmpty()) return;
         var slime=player.getWorld().spawn(locations.getFirst(),org.bukkit.entity.Slime.class);
         slime.setSize(Math.max(2,Math.min(8,plugin.getConfigManager().getInt("events.giant-slime.size",6))));
-        slime.setCustomName("SkyChaos Giant Slime");
+        slime.customName(Component.text("SkyChaos Giant Slime"));
+        plugin.markGiantSlime(slime);
         slime.setCustomNameVisible(true);
         plugin.getIslandManager().trackEventEntity(slime);
         announce("NEUTRAL","Riesenschleim");
     }
 
     private void announce(String category,String event) {
-        Bukkit.broadcastMessage("§e§l"+category+" EVENT §8» §f"+event);
+        SkyChaos.broadcastLegacy("§e§l"+category+" EVENT §8» §f"+event);
     }
 
     public void triggerManual() {
