@@ -33,10 +33,10 @@ public final class EventManager {
 
     public void triggerRandom() {
         if(!plugin.isActive() || plugin.isPaused()) return;
-        List<Player> participants=Bukkit.getOnlinePlayers().stream()
+        List<Player> participants=new ArrayList<>(Bukkit.getOnlinePlayers().stream()
                 .filter(player->player.getGameMode()==GameMode.SURVIVAL)
                 .filter(player->plugin.getIslandManager().contains(player.getLocation()))
-                .toList();
+                .toList());
         if(participants.isEmpty() || !plugin.getIslandManager().hasSurface()) return;
         Player target=participants.get(ThreadLocalRandom.current().nextInt(participants.size()));
         long minutes=plugin.getTimerManager().getElapsedMinutes();
