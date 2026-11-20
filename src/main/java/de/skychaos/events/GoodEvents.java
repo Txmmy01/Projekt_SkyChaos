@@ -85,14 +85,14 @@ public final class GoodEvents extends RandomEvent {
 
     public void regeneration(Player player) {
         if(!enabled("regeneration")) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,value("regeneration","duration",12)*20,
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.REGENERATION,value("regeneration","duration",12)*20,
                 Math.max(0,value("regeneration","amplifier",1)),false,false,true));
         announce("Regeneration");
     }
 
     public void absorption(Player player) {
         if(!enabled("absorption")) return;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,value("absorption","duration",45)*20,
+        plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.ABSORPTION,value("absorption","duration",45)*20,
                 Math.max(0,value("absorption","amplifier",1)),false,false,true));
         announce("Absorption");
     }
