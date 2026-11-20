@@ -169,7 +169,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        if(active && islandManager.contains(event.getLocation())) {
+        if(active && islandManager.contains(event.getEntity().getLocation())) {
             event.blockList().clear();
             event.setYield(0.0f);
         }
