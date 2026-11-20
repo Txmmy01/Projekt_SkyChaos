@@ -51,6 +51,11 @@ public abstract class RandomEvent {
         temporaryBlocks.putIfAbsent(block,block.getBlockData().clone());
     }
 
+    protected void restoreTemporaryBlock(Block block) {
+        BlockData original=temporaryBlocks.remove(block);
+        if(original!=null) block.setBlockData(original,false);
+    }
+
     protected void schedule(Runnable action,long delayTicks) {
         BukkitTask[] holder=new BukkitTask[1];
         holder[0]=Bukkit.getScheduler().runTaskLater(plugin,()->{
