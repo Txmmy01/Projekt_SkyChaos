@@ -94,7 +94,7 @@ public final class EventManager {
             case "NEUTRAL" -> {
                 add(choices,"block-swap",()->blockSwap());
                 add(choices,"gravity-flip",()->{
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST,
+                    plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.JUMP_BOOST,
                             plugin.getConfigManager().getInt("events.gravity-flip.duration",10)*20,1,false,false,true));
                     announce("NEUTRAL","Gravity Flip");
                 });
@@ -102,7 +102,7 @@ public final class EventManager {
                 add(choices,"inventory-shuffle",()->inventoryShuffle(player));
                 add(choices,"giant-slime",()->giantSlime(player));
                 add(choices,"low-gravity",()->{
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,
+                    plugin.applyChallengeEffect(player,new PotionEffect(PotionEffectType.SLOW_FALLING,
                             plugin.getConfigManager().getInt("events.low-gravity.duration",15)*20,0,false,false,true));
                     announce("NEUTRAL","Low Gravity");
                 });
