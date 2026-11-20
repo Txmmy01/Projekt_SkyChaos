@@ -1,0 +1,96 @@
+categories:
+  GOOD:
+    weight: 40
+    enabled: true
+  NEUTRAL:
+    weight: 30
+    enabled: true
+  BAD:
+    weight: 30
+    enabled: true
+  CHAOS:
+    weight: 10
+    enabled: true
+events:
+  loot-rain:
+    enabled: true
+    weight: 10
+    amount: 10
+  diamond-rain:
+    enabled: true
+    weight: 8
+    min: 3
+    max: 5
+  xp-boost:
+    enabled: true
+    weight: 8
+    duration: 60
+    multiplier: 2
+  trader-visit:
+    enabled: true
+    weight: 5
+    duration: 60
+  full-heal:
+    enabled: true
+    weight: 9
+  block-swap:
+    enabled: true
+    weight: 8
+    amount: 10
+  gravity-flip:
+    enabled: true
+    weight: 7
+    duration: 10
+  mob-party:
+    enabled: true
+    weight: 8
+    amount: 5
+  inventory-shuffle:
+    enabled: true
+    weight: 7
+  giant-slime:
+    enabled: true
+    weight: 5
+  block-disappear:
+    enabled: true
+    weight: 8
+    min: 5
+    max: 10
+  mob-attack:
+    enabled: true
+    weight: 8
+    min: 3
+    max: 5
+  creeper-rain:
+    enabled: true
+    weight: 7
+    amount: 3
+  lava-trap:
+    enabled: true
+    weight: 5
+    duration: 5
+  inventory-steal:
+    enabled: true
+    weight: 7
+  blindness:
+    enabled: true
+    weight: 8
+    duration: 15
+  island-quake:
+    enabled: true
+    weight: 7
+  double-event:
+    enabled: true
+    weight: 5
+  fire-storm:
+    enabled: true
+    weight: 5
+    duration: 10
+  enderman-invasion:
+    enabled: true
+    weight: 5
+    amount: 5
+  no-build:
+    enabled: true
+    weight: 5
+    duration: 20
