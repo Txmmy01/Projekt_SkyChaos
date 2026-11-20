@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
@@ -54,7 +55,14 @@ public final class BadEvents extends RandomEvent {
 
     public void creeperRain(Player player) {
         if(!enabled("creeper-rain")) return;
-        spawnHostile(player,value("creeper-rain","amount",3),new EntityType[]{EntityType.CREEPER});
+        int current=plugin.getIslandManager().countIslandEntities();
+        int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
+        int amount=Math.min(Math.max(0,value("creeper-rain","amount",3)),available);
+        for(int i=0;i<amount;i++) {
+            Location surface=safeLocation();
+            if(surface==null) break;
+            track(player.getWorld().spawnEntity(surface.add(0,8,0),EntityType.CREEPER));
+        }
         announce("Creeper-Regen");
     }
 
@@ -62,7 +70,13 @@ public final class BadEvents extends RandomEvent {
         int current=plugin.getIslandManager().countIslandEntities();
         int limit=plugin.getConfig().getInt("events.max-entities",40);
         for(int i=0;i<Math.min(Math.max(0,amount),Math.max(0,limit-current));i++) {
-            Location location=safeLocation();
+            Location location=player.getLocation().clone().add(ThreadLocalRandom.current().nextInt(-3,4),0,
+                    ThreadLocalRandom.current().nextInt(-3,4));
+            location.setX(location.getBlockX()+0.5);
+            location.setZ(location.getBlockZ()+0.5);
+            if(!plugin.getIslandManager().contains(location) || !location.getBlock().isPassable()
+                    || !location.clone().add(0,1,0).getBlock().isPassable()
+                    || !location.clone().subtract(0,1,0).getBlock().getType().isSolid()) location=safeLocation();
             if(location==null) break;
             EntityType type=types[ThreadLocalRandom.current().nextInt(types.length)];
             track(player.getWorld().spawnEntity(location,type));
