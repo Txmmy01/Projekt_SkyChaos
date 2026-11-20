@@ -26,7 +26,7 @@ public final class ChaosEvents extends RandomEvent {
 
     @Override
     public void cleanup() {
-        if(fireWorld!=null && previousFireTick!=null) fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
+        if(fireWorld!=null && previousFireSpreadRadius!=null) fireWorld.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER,previousFireSpreadRadius);
         fireWorld=null;
         previousFireSpreadRadius=null;
         super.cleanup();
