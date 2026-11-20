@@ -149,7 +149,7 @@ public final class EventManager {
         int changed=0;
         for(var block:blocks) {
             if(changed>=amount) break;
-            if(block.getType().isSolid() && !block.getType().isInteractable()) {
+            if(block.getType().isSolid() && !block.getType().isInteractable() && !(block.getState() instanceof org.bukkit.block.TileState)) {
                 block.setType(safeMaterials.get(ThreadLocalRandom.current().nextInt(safeMaterials.size())),false);
                 changed++;
             }
