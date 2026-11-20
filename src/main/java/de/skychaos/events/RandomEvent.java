@@ -44,7 +44,10 @@ public abstract class RandomEvent {
     }
 
     protected void track(Entity entity) {
-        if(entity!=null) {\n            spawnedEntities.removeIf(uuid->Bukkit.getEntity(uuid)==null);\n            spawnedEntities.add(entity.getUniqueId());\n        }
+        if(entity!=null) {
+            spawnedEntities.removeIf(uuid->Bukkit.getEntity(uuid)==null);
+            spawnedEntities.add(entity.getUniqueId());
+        }
     }
 
     protected void trackTemporaryBlock(Block block) {
