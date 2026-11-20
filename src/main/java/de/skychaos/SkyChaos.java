@@ -18,6 +18,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +39,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private boolean buildMode;
     private int deaths;
     private long noBuildUntil;
+    private long xpBoostUntil;
 
     @Override
     public void onEnable() {
@@ -93,14 +96,14 @@ public final class SkyChaos extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if(!active || paused) return;
-        if(System.currentTimeMillis()<noBuildUntil || !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+        if(!active) return;
+        if(paused || System.currentTimeMillis()<noBuildUntil || !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(!active || paused) return;
-        if(System.currentTimeMillis()<noBuildUntil || !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
+        if(!active) return;
+        if(paused || System.currentTimeMillis()<noBuildUntil || !islandManager.contains(event.getBlock().getLocation())) event.setCancelled(true);
     }
 
     @EventHandler
@@ -110,16 +113,28 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         deaths++;
         int remaining=lives.getOrDefault(player.getUniqueId(),getConfig().getInt("lives",3))-1;
         lives.put(player.getUniqueId(),remaining);
-        Bukkit.getScheduler().runTask(this,()->{
-            if(remaining<=0) {
-                player.setGameMode(GameMode.SPECTATOR);
-                player.sendMessage("§cDu hast keine Leben mehr. Game Over!");
-            } else {
-                player.spigot().respawn();
+        if(remaining<=0) player.sendMessage("§cDu hast keine Leben mehr. Game Over!");
+        else player.sendMessage("§cDu bist gestorben. §fVerbleibende Leben: §e"+remaining);
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        if(!active) return;
+        Player player=event.getPlayer();
+        event.setRespawnLocation(islandManager.getSpawnLocation());
+        if(lives.getOrDefault(player.getUniqueId(),0)<=0) {
+            Bukkit.getScheduler().runTask(this,()->player.setGameMode(GameMode.SPECTATOR));
+        } else {
+            Bukkit.getScheduler().runTask(this,()->{
+                player.setGameMode(GameMode.SURVIVAL);
                 player.teleport(islandManager.getSpawnLocation());
-                player.sendMessage("§cDu bist gestorben. §fVerbleibende Leben: §e"+remaining);
-            }
-        });
+            });
+        }
+    }
+
+    @EventHandler
+    public void onExpChange(PlayerExpChangeEvent event) {
+        if(active && !paused && System.currentTimeMillis()<xpBoostUntil) event.setAmount(event.getAmount()*2);
     }
 
     public void prepareIdlePlayer(Player player) {
@@ -136,6 +151,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         paused=false;
         buildMode=false;
         noBuildUntil=0L;
+        xpBoostUntil=0L;
         deaths=0;
         lives.clear();
         for(Player player:Bukkit.getOnlinePlayers()) {
@@ -210,4 +226,5 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     public YamlConfiguration getConfigManager() { return eventsConfig; }
     public int getDeaths() { return deaths; }
     public void setNoBuildUntil(long timestamp) { noBuildUntil=timestamp; }
+    public void startXpBoost(int seconds) { xpBoostUntil=System.currentTimeMillis()+seconds*1000L; }
 }
