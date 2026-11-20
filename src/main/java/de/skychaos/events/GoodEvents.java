@@ -29,7 +29,7 @@ public final class GoodEvents extends RandomEvent {
         int entityCapacity=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-plugin.getIslandManager().countIslandEntities());
         int amount=Math.min(value("loot-rain","amount",10),Math.min(itemCapacity,entityCapacity));
         for(Location surface:plugin.getIslandManager().randomSurfaceLocations(amount)) {
-            Item item=player.getWorld().dropItem(surface.add(0,6,0),new ItemStack(pool.get(ThreadLocalRandom.current().nextInt(pool.size()))));
+            Item item=player.getWorld().dropItem(surface.add(0,Math.max(0,Math.min(6,player.getWorld().getMaxHeight()-surface.getBlockY()-2)),0),new ItemStack(pool.get(ThreadLocalRandom.current().nextInt(pool.size()))));
             track(item);
         }
         announce("Lootregen");
@@ -43,7 +43,7 @@ public final class GoodEvents extends RandomEvent {
         int entityCapacity=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-plugin.getIslandManager().countIslandEntities());
         int amount=Math.min(ThreadLocalRandom.current().nextInt(min,max+1),Math.min(itemCapacity,entityCapacity));
         for(Location surface:plugin.getIslandManager().randomSurfaceLocations(amount)) {
-            Item item=player.getWorld().dropItem(surface.add(0,5,0),new ItemStack(Material.DIAMOND));
+            Item item=player.getWorld().dropItem(surface.add(0,Math.max(0,Math.min(5,player.getWorld().getMaxHeight()-surface.getBlockY()-2)),0),new ItemStack(Material.DIAMOND));
             track(item);
         }
         announce("Diamantenregen");
