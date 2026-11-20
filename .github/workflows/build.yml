@@ -28,7 +28,7 @@ jobs:
       - name: Validate and build
         run: mvn --batch-mode --no-transfer-progress clean verify
       - name: Upload plugin
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: SkyChaos-build
           path: target/SkyChaos.jar
