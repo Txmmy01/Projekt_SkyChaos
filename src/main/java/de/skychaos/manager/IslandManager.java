@@ -60,6 +60,45 @@ public final class IslandManager {
         pos2=location==null?null:location.clone();
     }
 
+    public void createDefaultStarterIsland() throws IOException {
+        if(file.isFile()) return;
+        for(int x=-5;x<=5;x++) for(int z=-5;z<=5;z++) {
+            world.getBlockAt(x,79,z).setType(Material.DIRT,false);
+            world.getBlockAt(x,80,z).setType(Material.GRASS_BLOCK,false);
+        }
+        for(int y=81;y<=84;y++) world.getBlockAt(-3,y,-3).setType(Material.OAK_LOG,false);
+        for(int x=-5;x<=-1;x++) for(int y=83;y<=86;y++) for(int z=-5;z<=-1;z++) {
+            if(Math.abs(x+3)+Math.abs(z+3)+Math.abs(y-84)<=5
+                    && world.getBlockAt(x,y,z).getType().isAir())
+                world.getBlockAt(x,y,z).setType(Material.OAK_LEAVES,false);
+        }
+        world.getBlockAt(1,80,2).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(3,80,2).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(2,80,1).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(2,80,3).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(2,81,1).setType(Material.WATER,false);
+        world.getBlockAt(2,81,3).setType(Material.LAVA,false);
+        world.getBlockAt(2,81,2).setType(Material.AIR,false);
+        world.getBlockAt(-2,81,0).setType(Material.CHEST,false);
+        if(world.getBlockAt(-2,81,0).getState() instanceof Container chest) {
+            chest.getInventory().addItem(
+                    new ItemStack(Material.ICE,2),
+                    new ItemStack(Material.LAVA_BUCKET,1),
+                    new ItemStack(Material.WATER_BUCKET,1),
+                    new ItemStack(Material.OAK_SAPLING,2),
+                    new ItemStack(Material.WHEAT_SEEDS,4),
+                    new ItemStack(Material.BREAD,3),
+                    new ItemStack(Material.BONE_MEAL,4)
+            );
+            chest.update(true,false);
+        }
+        world.setSpawnLocation(0,81,0);
+        setPos1(new Location(world,-5,79,-5));
+        setPos2(new Location(world,5,86,5));
+        if(!save()) throw new IOException("Die automatische Starterinsel konnte nicht gespeichert werden.");
+        plugin.getLogger().info("Die Standard-Skyblock-Starterinsel wurde automatisch erstellt.");
+    }
+
     public boolean save() throws IOException {
         if(pos1==null || pos2==null || pos1.getWorld()==null || pos2.getWorld()==null
                 || !world.equals(pos1.getWorld()) || !world.equals(pos2.getWorld())) return false;
