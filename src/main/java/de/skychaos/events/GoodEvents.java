@@ -8,6 +8,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -51,6 +52,11 @@ public final class GoodEvents extends RandomEvent {
         Villager villager=(Villager)player.getWorld().spawnEntity(location, EntityType.VILLAGER);
         villager.setCustomName("§bSkyChaos-Händler");
         villager.setCustomNameVisible(true);
+        MerchantRecipe ironTrade=new MerchantRecipe(new ItemStack(Material.DIAMOND),64);
+        ironTrade.addIngredient(new ItemStack(Material.IRON_INGOT,8));
+        MerchantRecipe emeraldTrade=new MerchantRecipe(new ItemStack(Material.EMERALD,2),64);
+        emeraldTrade.addIngredient(new ItemStack(Material.COBBLESTONE,16));
+        villager.setRecipes(List.of(ironTrade,emeraldTrade));
         Bukkit.getScheduler().runTaskLater(plugin,villager::remove,value("trader-visit","duration",60)*20L);
         announce("Händlerbesuch");
     }
