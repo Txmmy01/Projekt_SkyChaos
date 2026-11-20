@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public final class IslandManager {
     private final SkyChaos plugin;
@@ -71,7 +70,7 @@ public final class IslandManager {
         int ex=Math.max(x1,x2),ey=Math.min(world.getMaxHeight()-1,Math.max(y1,y2)),ez=Math.max(z1,z2);
         long sx=(long)ex-ox+1,sy=(long)ey-oy+1,sz=(long)ez-oz+1;
         long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
-        if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks)
+        if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks || ex==Integer.MAX_VALUE || ez==Integer.MAX_VALUE)
             throw new IllegalArgumentException("Der Bereich ist leer oder überschreitet island.max-blocks.");
         long count=Math.multiplyExact(Math.multiplyExact(sx,sy),sz);
         if(count>maxBlocks) throw new IllegalArgumentException("Der Bereich überschreitet island.max-blocks.");
@@ -131,7 +130,7 @@ public final class IslandManager {
         long maxBlocks=Math.max(1,plugin.getConfig().getInt("island.max-blocks",50000));
         if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks
                 || oy<world.getMinHeight() || (long)oy+sy>world.getMaxHeight()
-                || (long)ox+sx-1>Integer.MAX_VALUE || (long)oz+sz-1>Integer.MAX_VALUE) {
+                || (long)ox+sx-1>=Integer.MAX_VALUE || (long)oz+sz-1>=Integer.MAX_VALUE) {
             throw new IllegalStateException("Die gespeicherte Insel ist ungültig oder überschreitet die Weltgrenzen.");
         }
         long count=Math.multiplyExact(Math.multiplyExact((long)sx,sy),sz);
@@ -202,7 +201,7 @@ public final class IslandManager {
         if(sx<1 || sy<1 || sz<1 || sx>maxBlocks || sy>maxBlocks || sz>maxBlocks
                 || (long)sx*sy*sz>maxBlocks || oy<world.getMinHeight()
                 || (long)oy+sy>world.getMaxHeight() || (long)ox+sx-1>Integer.MAX_VALUE
-                || (long)oz+sz-1>Integer.MAX_VALUE || !world.getName().equals(yaml.getString("world",world.getName()))) return;
+                || (long)oz+sz-1>=Integer.MAX_VALUE || !world.getName().equals(yaml.getString("world",world.getName()))) return;
         minX=ox; minY=oy; minZ=oz;
         maxX=ox+sx-1; maxY=oy+sy-1; maxZ=oz+sz-1;
         boundsLoaded=true;
