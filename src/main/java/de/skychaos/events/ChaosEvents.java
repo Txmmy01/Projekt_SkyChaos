@@ -21,7 +21,18 @@ public final class ChaosEvents extends RandomEvent {
     @Override public String name() { return "Chaos Events"; }
     @Override public void execute(Player player) { }
 
-    private World fireWorld;\n    private Boolean previousFireTick;\n\n    @Override\n    public void cleanup() {\n        if(fireWorld!=null && previousFireTick!=null) fireWorld.setGameRule(GameRule.DO_FIRE_TICK,previousFireTick);\n        fireWorld=null;\n        previousFireTick=null;\n        super.cleanup();\n    }\n\n    public void fireStorm(Player player) {
+    private World fireWorld;
+    private Boolean previousFireTick;
+
+    @Override
+    public void cleanup() {
+        if(fireWorld!=null && previousFireTick!=null) fireWorld.setGameRule(GameRule.DO_FIRE_TICK,previousFireTick);
+        fireWorld=null;
+        previousFireTick=null;
+        super.cleanup();
+    }
+
+    public void fireStorm(Player player) {
         if(!enabled("fire-storm")) return;
         List<org.bukkit.block.Block> flames=new ArrayList<>();
         for(var block:plugin.getIslandManager().getIslandBlocks()) {
