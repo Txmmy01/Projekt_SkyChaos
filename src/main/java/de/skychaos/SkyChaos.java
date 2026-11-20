@@ -282,6 +282,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             return islandManager.getSpawnLocation();
         } catch(IllegalStateException exception) {
             player.setGameMode(GameMode.SPECTATOR);
+            player.setAllowFlight(true);
             player.sendMessage("§eDie Insel hat keinen sicheren Spawn mehr. Du wurdest in den Spectator-Modus versetzt.");
             return islandManager.getWorld().getSpawnLocation();
         }
