@@ -57,6 +57,7 @@ public final class GoodEvents extends RandomEvent {
 
     public void traderVisit(Player player) {
         if(!enabled("trader-visit")) return;
+        if(plugin.getIslandManager().countIslandEntities()>=plugin.getConfig().getInt("events.max-entities",40)) return;
         Location location=safeLocation();
         if(location==null) return;
         Villager villager=player.getWorld().spawn(location,Villager.class);
