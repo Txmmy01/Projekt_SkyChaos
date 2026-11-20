@@ -52,13 +52,13 @@ public final class WorldSetupManager {
             overworld.getBlockAt(x,80,z).setType(Material.AIR,false);
         }
         for(int x=6;x<=15;x++) overworld.getBlockAt(x,80,0).setType(Material.STONE_BRICKS,false);
-        for(int y=81;y<=85;y++) {
+        for(int y=80;y<=84;y++) {
             overworld.getBlockAt(18,y,0).setType(Material.OBSIDIAN,false);
             overworld.getBlockAt(21,y,0).setType(Material.OBSIDIAN,false);
         }
         for(int x=19;x<=20;x++) {
-            overworld.getBlockAt(x,81,0).setType(Material.OBSIDIAN,false);
-            overworld.getBlockAt(x,85,0).setType(Material.OBSIDIAN,false);
+            overworld.getBlockAt(x,80,0).setType(Material.OBSIDIAN,false);
+            overworld.getBlockAt(x,84,0).setType(Material.OBSIDIAN,false);
         }
         for(int x=23;x<=27;x++) for(int z=-3;z<=3;z++) {
             if(x==23 || x==27 || z==-3 || z==3) overworld.getBlockAt(x,80,z).setType(Material.STONE_BRICKS,false);
@@ -103,6 +103,7 @@ public final class WorldSetupManager {
         fill(nether,x1,80,z1,x1,87,z2,Material.NETHER_BRICKS);
         fill(nether,x2,80,z1,x2,87,z2,Material.NETHER_BRICKS);
         fill(nether,x1+1,80,z1+1,x2-1,86,z2-1,Material.AIR);
+        fill(nether,29,80,-1,29,81,1,Material.AIR);
         fill(nether,x1+1,87,z1+1,x2-1,87,z2-1,Material.NETHER_BRICK_SLAB);
         for(int x=x1+2;x<x2;x+=4) {
             nether.getBlockAt(x,88,z1).setType(Material.NETHER_BRICK_FENCE,false);
@@ -130,7 +131,7 @@ public final class WorldSetupManager {
     private void buildEnd() {
         platform(end,0,79,0,10,Material.END_STONE);
         for(int x=10;x<=38;x++) end.getBlockAt(x,79,0).setType(Material.OBSIDIAN,false);
-        platform(end,39,79,0,10,Material.END_STONE);
+        platform(end,39,79,0,16,Material.END_STONE);
         for(int x:new int[]{42,54}) for(int z:new int[]{-5,5}) {
             fill(end,x,80,z,x,87,z,Material.OBSIDIAN);
         }
