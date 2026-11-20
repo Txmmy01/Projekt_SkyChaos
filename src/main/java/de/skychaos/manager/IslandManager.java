@@ -78,6 +78,8 @@ public final class IslandManager {
         }
         world.getBlockAt(2,80,1).setType(Material.STONE_BRICKS,false);
         world.getBlockAt(2,80,3).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(2,81,0).setType(Material.STONE_BRICKS,false);
+        world.getBlockAt(2,81,4).setType(Material.STONE_BRICKS,false);
         world.getBlockAt(2,81,1).setType(Material.WATER,false);
         world.getBlockAt(2,81,3).setType(Material.LAVA,false);
         world.getBlockAt(2,81,2).setType(Material.AIR,false);
