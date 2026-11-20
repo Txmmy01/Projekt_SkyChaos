@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -129,6 +130,16 @@ public final class SkyChaos extends JavaPlugin implements Listener {
                 player.setGameMode(GameMode.SURVIVAL);
                 player.teleport(islandManager.getSpawnLocation());
             });
+        }
+    }
+
+    @EventHandler
+    public void onGiantSlimeDeath(EntityDeathEvent event) {
+        if(event.getEntity() instanceof org.bukkit.entity.Slime slime
+                && "SkyChaos Giant Slime".equals(slime.getCustomName())) {
+            event.getDrops().add(new org.bukkit.inventory.ItemStack(Material.DIAMOND,2));
+            event.getDrops().add(new org.bukkit.inventory.ItemStack(Material.EMERALD,4));
+            event.setDroppedExp(event.getDroppedExp()+25);
         }
     }
 
