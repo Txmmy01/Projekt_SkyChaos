@@ -231,10 +231,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
             event.getPlayer().teleport(resolveChallengeSpawn(event.getPlayer()));
             return;
         }
-        if(event.getTo().getBlockX()!=event.getFrom().getBlockX()
-                || event.getTo().getBlockZ()!=event.getFrom().getBlockZ()) {
-            if(!islandManager.contains(event.getTo())) event.setTo(event.getFrom());
-        }
+        if(!islandManager.contains(event.getTo())) event.setTo(event.getFrom());
     }
 
     @EventHandler
