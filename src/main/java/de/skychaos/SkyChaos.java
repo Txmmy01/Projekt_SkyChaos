@@ -7,6 +7,7 @@ import de.skychaos.manager.TimerManager;
 import de.skychaos.world.VoidGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -51,6 +52,8 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private long noBuildUntil;
     private long xpBoostUntil;
     private int xpBoostMultiplier=2;
+    private Boolean previousMobGriefing;
+    private Boolean previousMobSpawning;
 
     @Override
     public void onEnable() {
@@ -93,6 +96,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         if(timerManager!=null) timerManager.stop();
         if(eventManager!=null) eventManager.cleanup();
         clearTemporaryEffects();
+        restoreWorldRules();
     }
 
     private void loadEventsConfig() {
@@ -251,6 +255,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         islandManager.restore();
         active=true;
         paused=false;
+        applyWorldRules();
         buildMode=false;
         noBuildUntil=0L;
         xpBoostUntil=0L;
@@ -296,6 +301,23 @@ public final class SkyChaos extends JavaPlugin implements Listener {
     private int parseAmount(String value) {
         try { return Integer.parseInt(value); }
         catch(NumberFormatException exception) { return -1; }
+    }
+
+    private void applyWorldRules() {
+        World world=islandManager.getWorld();
+        if(previousMobGriefing==null) previousMobGriefing=world.getGameRuleValue(GameRule.MOB_GRIEFING);
+        if(previousMobSpawning==null) previousMobSpawning=world.getGameRuleValue(GameRule.DO_MOB_SPAWNING);
+        world.setGameRule(GameRule.MOB_GRIEFING,false);
+        world.setGameRule(GameRule.DO_MOB_SPAWNING,false);
+    }
+
+    private void restoreWorldRules() {
+        if(islandManager==null) return;
+        World world=islandManager.getWorld();
+        if(previousMobGriefing!=null) world.setGameRule(GameRule.MOB_GRIEFING,previousMobGriefing);
+        if(previousMobSpawning!=null) world.setGameRule(GameRule.DO_MOB_SPAWNING,previousMobSpawning);
+        previousMobGriefing=null;
+        previousMobSpawning=null;
     }
 
     private void clearTemporaryEffects() {
@@ -347,6 +369,7 @@ public final class SkyChaos extends JavaPlugin implements Listener {
         timerManager.stop();
         eventManager.cleanup();
         clearTemporaryEffects();
+        restoreWorldRules();
         for(Player player:Bukkit.getOnlinePlayers()) prepareIdlePlayer(player);
     }
 
