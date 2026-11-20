@@ -58,9 +58,7 @@ public final class BadEvents extends RandomEvent {
         int current=plugin.getIslandManager().countIslandEntities();
         int available=Math.max(0,plugin.getConfig().getInt("events.max-entities",40)-current);
         int amount=Math.min(Math.max(0,value("creeper-rain","amount",3)),available);
-        for(int i=0;i<amount;i++) {
-            Location surface=safeLocation();
-            if(surface==null) break;
+        for(Location surface:plugin.getIslandManager().randomSurfaceLocations(amount)) {
             track(player.getWorld().spawnEntity(surface.add(0,8,0),EntityType.CREEPER));
         }
         announce("Creeper-Regen");
@@ -69,15 +67,20 @@ public final class BadEvents extends RandomEvent {
     private void spawnHostile(Player player,int amount,EntityType[] types) {
         int current=plugin.getIslandManager().countIslandEntities();
         int limit=plugin.getConfig().getInt("events.max-entities",40);
-        for(int i=0;i<Math.min(Math.max(0,amount),Math.max(0,limit-current));i++) {
+        int spawnAmount=Math.min(Math.max(0,amount),Math.max(0,limit-current));
+        List<Location> fallbackLocations=plugin.getIslandManager().randomSurfaceLocations(spawnAmount);
+        int fallbackIndex=0;
+        for(int i=0;i<spawnAmount;i++) {
             Location location=player.getLocation().clone().add(ThreadLocalRandom.current().nextInt(-3,4),0,
                     ThreadLocalRandom.current().nextInt(-3,4));
             location.setX(location.getBlockX()+0.5);
             location.setZ(location.getBlockZ()+0.5);
             if(!plugin.getIslandManager().contains(location) || !location.getBlock().isPassable()
                     || !location.clone().add(0,1,0).getBlock().isPassable()
-                    || !location.clone().subtract(0,1,0).getBlock().getType().isSolid()) location=safeLocation();
-            if(location==null) break;
+                    || !location.clone().subtract(0,1,0).getBlock().getType().isSolid()) {
+                if(fallbackIndex>=fallbackLocations.size()) break;
+                location=fallbackLocations.get(fallbackIndex++);
+            }
             EntityType type=types[ThreadLocalRandom.current().nextInt(types.length)];
             track(player.getWorld().spawnEntity(location,type));
         }
