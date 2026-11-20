@@ -36,7 +36,7 @@ public final class BadEvents extends RandomEvent {
         int changed=0;
         for(Block block:blocks) {
             if(changed>=amount) break;
-            if(block.getType().isSolid() && !block.getType().isInteractable()) {
+            if(block.getType().isSolid() && !block.getType().isInteractable() && !(block.getState() instanceof TileState)) {
                 block.setType(Material.AIR,false);
                 changed++;
             }
