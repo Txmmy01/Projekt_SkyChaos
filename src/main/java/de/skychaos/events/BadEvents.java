@@ -1,11 +1,9 @@
 package de.skychaos.events;
 
 import de.skychaos.SkyChaos;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.TileState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
@@ -29,6 +27,10 @@ public final class BadEvents extends RandomEvent {
     public void blockDisappear(Player player) {
         if(!enabled("block-disappear")) return;
         List<Block> blocks=new ArrayList<>(plugin.getIslandManager().getIslandBlocks());
+        List<Material> safeBlocks=List.of(Material.STONE,Material.COBBLESTONE,Material.DIRT,Material.GRASS_BLOCK,
+                Material.SAND,Material.RED_SAND,Material.GRAVEL,Material.OAK_PLANKS,Material.SPRUCE_PLANKS,
+                Material.BIRCH_PLANKS,Material.JUNGLE_PLANKS,Material.ACACIA_PLANKS,Material.DARK_OAK_PLANKS,
+                Material.ANDESITE,Material.DIORITE,Material.GRANITE,Material.DEEPSLATE,Material.COBBLED_DEEPSLATE);
         Collections.shuffle(blocks);
         int min=Math.max(1,value("block-disappear","min",5));
         int max=Math.max(min,value("block-disappear","max",10));
@@ -36,7 +38,7 @@ public final class BadEvents extends RandomEvent {
         int changed=0;
         for(Block block:blocks) {
             if(changed>=amount) break;
-            if(block.getType().isSolid() && !block.getType().isInteractable() && !(block.getState() instanceof TileState)) {
+            if(safeBlocks.contains(block.getType())) {
                 block.setType(Material.AIR,false);
                 changed++;
             }
@@ -175,6 +177,6 @@ public final class BadEvents extends RandomEvent {
     }
 
     private void announce(String event) {
-        Bukkit.broadcastMessage("§c§lBAD EVENT §8» §f"+event);
+        SkyChaos.broadcastLegacy("§c§lBAD EVENT §8» §f"+event);
     }
 }
