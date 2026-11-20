@@ -109,9 +109,13 @@ public final class BadEvents extends RandomEvent {
 
     public void islandQuake(Player player) {
         if(!enabled("island-quake")) return;
+        int fallingLimit=Math.max(0,plugin.getConfigManager().getInt("events.island-quake.max-falling-blocks",40));
+        int fallingCount=0;
         for(Block block:plugin.getIslandManager().getIslandBlocks()) {
+            if(fallingCount>=fallingLimit) break;
             Material type=block.getType();
             if(type==Material.SAND || type==Material.RED_SAND || type==Material.GRAVEL) {
+                fallingCount++;
                 FallingBlock falling=block.getWorld().spawnFallingBlock(block.getLocation().add(0.5,0.0,0.5),block.getBlockData());
                 falling.setDropItem(false);
                 track(falling);
