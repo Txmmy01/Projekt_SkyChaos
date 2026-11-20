@@ -7,7 +7,7 @@ description: Configurable SkyBlock challenge with timed random events
 commands:
   challenge:
     description: Verwaltet die SkyChaos-Challenge
-    usage: /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats|stop>
+    usage: /challenge <build|pos1|pos2|save|start|reset|pause|resume|event|stats|stop|reload>
     aliases: [sc]
 permissions:
   skychaos.admin:
