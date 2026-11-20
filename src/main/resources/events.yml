@@ -33,12 +33,12 @@ events:
   lava-trap: { enabled: true, weight: 5, duration: 5 }
   inventory-steal: { enabled: true, weight: 7 }
   blindness: { enabled: true, weight: 8, duration: 15 }
-  island-quake: { enabled: true, weight: 7 }
+  island-quake: { enabled: true, weight: 7, max-falling-blocks: 40 }
   hunger: { enabled: true, weight: 6, duration: 12, amplifier: 1 }
   poison: { enabled: true, weight: 5, duration: 8, amplifier: 0 }
   cobweb-trap: { enabled: true, weight: 5, duration: 8 }
   lightning-warning: { enabled: true, weight: 5 }
-  fire-storm: { enabled: true, weight: 5, duration: 10 }
+  fire-storm: { enabled: true, weight: 5, duration: 10, max-fire-blocks: 50 }
   enderman-invasion: { enabled: true, weight: 5, amount: 5 }
   no-build: { enabled: true, weight: 5, duration: 20 }
   wither: { enabled: true, weight: 4, duration: 8 }
