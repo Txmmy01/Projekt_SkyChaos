@@ -11,6 +11,7 @@ import org.bukkit.block.Container;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -249,6 +250,14 @@ public final class IslandManager {
         int count=0;
         for(Entity entity:world.getEntities()) {
             if(!(entity instanceof Player) && contains(entity.getLocation())) count++;
+        }
+        return count;
+    }
+
+    public int countIslandItems() {
+        int count=0;
+        for(Entity entity:world.getEntities()) {
+            if(entity instanceof Item && contains(entity.getLocation())) count++;
         }
         return count;
     }
