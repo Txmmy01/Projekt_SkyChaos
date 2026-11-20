@@ -23,18 +23,18 @@ public final class BadEvents extends RandomEvent {
     @Override public void execute(Player player) { }
 
     public void blockDisappear(Player player) {
-        if (!enabled()) return;
+        if (!enabled("block-disappear")) return;
         List<Block> blocks=new ArrayList<>(plugin.getIslandManager().getIslandBlocks());
         Collections.shuffle(blocks);
-        int amount=Math.min(blocks.size(),ThreadLocalRandom.current().nextInt(value("min",5),value("max",10)+1));
+        int amount=Math.min(blocks.size(),ThreadLocalRandom.current().nextInt(value("block-disappear","min",5),value("block-disappear","max",10)+1));
         for(int i=0;i<amount;i++) if(blocks.get(i).getType().isSolid()) blocks.get(i).setType(Material.AIR,false);
         announce("Block-Verschwinden");
     }
 
     public void mobAttack(Player player) {
-        if (!enabled()) return;
+        if (!enabled("mob-attack")) return;
         EntityType[] types={EntityType.ZOMBIE,EntityType.SKELETON,EntityType.SPIDER};
-        int amount=ThreadLocalRandom.current().nextInt(value("min",3),value("max",5)+1);
+        int amount=ThreadLocalRandom.current().nextInt(value("mob-attack","min",3),value("mob-attack","max",5)+1);
         for(int i=0;i<amount;i++) {
             Location location=plugin.getIslandManager().randomSurfaceLocation();
             player.getWorld().spawnEntity(location,types[ThreadLocalRandom.current().nextInt(types.length)]);
@@ -43,8 +43,8 @@ public final class BadEvents extends RandomEvent {
     }
 
     public void creeperRain(Player player) {
-        if (!enabled()) return;
-        for(int i=0;i<value("amount",3);i++) {
+        if (!enabled("creeper-rain")) return;
+        for(int i=0;i<value("creeper-rain","amount",3);i++) {
             Location location=plugin.getIslandManager().randomSurfaceLocation().add(0,8,0);
             player.getWorld().spawnEntity(location,EntityType.CREEPER);
         }
@@ -52,17 +52,17 @@ public final class BadEvents extends RandomEvent {
     }
 
     public void lavaTrap(Player player) {
-        if (!enabled()) return;
+        if (!enabled("lava-trap")) return;
         Block block=player.getLocation().subtract(0,1,0).getBlock();
         if (!plugin.getIslandManager().contains(block.getLocation()) || !block.getType().isAir()) return;
         Material previous=block.getType();
         block.setType(Material.LAVA,false);
-        Bukkit.getScheduler().runTaskLater(plugin,()->block.setType(previous,false),value("duration",5)*20L);
+        Bukkit.getScheduler().runTaskLater(plugin,()->block.setType(previous,false),value("lava-trap","duration",5)*20L);
         announce("Lavafalle");
     }
 
     public void inventorySteal(Player player) {
-        if (!enabled()) return;
+        if (!enabled("inventory-steal")) return;
         int slot=ThreadLocalRandom.current().nextInt(0,9);
         ItemStack item=player.getInventory().getItem(slot);
         if(item!=null) {
@@ -73,15 +73,15 @@ public final class BadEvents extends RandomEvent {
     }
 
     public void blindness(Player player) {
-        if (!enabled()) return;
-        int duration=value("duration",15)*20;
+        if (!enabled("blindness")) return;
+        int duration=value("blindness","duration",15)*20;
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,duration,0));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,duration,0));
         announce("Dunkelheit");
     }
 
     public void islandQuake(Player player) {
-        if (!enabled()) return;
+        if (!enabled("island-quake")) return;
         for(Block block:plugin.getIslandManager().getIslandBlocks()) {
             if(block.getType()==Material.SAND || block.getType()==Material.RED_SAND || block.getType()==Material.GRAVEL) {
                 block.getWorld().spawnFallingBlock(block.getLocation().add(0.5,0,0.5),block.getBlockData());
