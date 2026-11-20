@@ -209,7 +209,7 @@ public final class IslandManager {
         List<Block> surfaces=new ArrayList<>();
         for(Block block:getIslandBlocks()) {
             if(block.getType().isSolid() && block.getRelative(0,1,0).getType().isAir()
-                    && block.getY()+2<world.getMaxHeight()) surfaces.add(block);
+                    && block.getRelative(0,2,0).getType().isAir() && block.getY()+2<world.getMaxHeight()) surfaces.add(block);
         }
         if(surfaces.isEmpty()) return null;
         Block selected=surfaces.get(ThreadLocalRandom.current().nextInt(surfaces.size()));
