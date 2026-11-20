@@ -273,7 +273,7 @@ public final class IslandManager {
     }
 
     public void trackEventEntity(Entity entity) {
-        if(entity!=null) trackedEntities.add(entity.getUniqueId());
+        if(entity!=null) {\n            trackedEntities.removeIf(uuid->Bukkit.getEntity(uuid)==null);\n            trackedEntities.add(entity.getUniqueId());\n        }
     }
 
     public void cleanupTrackedEntities() {
